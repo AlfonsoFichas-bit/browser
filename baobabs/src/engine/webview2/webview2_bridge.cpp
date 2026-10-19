@@ -39,16 +39,22 @@ struct WebView2Bridge {
 
     WebView2URLChangedCallback url_cb;
     void* url_user_data;
+    WebView2DestroyNotify url_destroy;
     WebView2TitleChangedCallback title_cb;
     void* title_user_data;
+    WebView2DestroyNotify title_destroy;
     WebView2InitReadyCallback ready_cb;
     void* ready_user_data;
+    WebView2DestroyNotify ready_destroy;
     WebView2NavStartingCallback nav_starting_cb;
     void* nav_starting_user_data;
+    WebView2DestroyNotify nav_starting_destroy;
     WebView2NavCompletedCallback nav_completed_cb;
     void* nav_completed_user_data;
+    WebView2DestroyNotify nav_completed_destroy;
     WebView2HistoryChangedCallback history_changed_cb;
     void* history_changed_user_data;
+    WebView2DestroyNotify history_changed_destroy;
 
     bool com_initialized;
 
@@ -64,16 +70,22 @@ struct WebView2Bridge {
           offset_y(48),
           url_cb(nullptr),
           url_user_data(nullptr),
+          url_destroy(nullptr),
           title_cb(nullptr),
           title_user_data(nullptr),
+          title_destroy(nullptr),
           ready_cb(nullptr),
           ready_user_data(nullptr),
+          ready_destroy(nullptr),
           nav_starting_cb(nullptr),
           nav_starting_user_data(nullptr),
+          nav_starting_destroy(nullptr),
           nav_completed_cb(nullptr),
           nav_completed_user_data(nullptr),
+          nav_completed_destroy(nullptr),
           history_changed_cb(nullptr),
           history_changed_user_data(nullptr),
+          history_changed_destroy(nullptr),
           com_initialized(false) {}
 
     void UpdateBounds(int logical_w, int logical_h) {
@@ -145,7 +157,8 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
                                 int offset_y,
                                 const char* user_data_dir,
                                 WebView2InitReadyCallback ready_cb,
-                                void* user_data) {
+                                void* user_data,
+                                WebView2DestroyNotify destroy) {
     if (!bridge) {
         fprintf(stderr, "[WebView2 Bridge] ERROR: initialize called with NULL bridge!\n");
         fflush(stderr);
@@ -153,8 +166,12 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
     }
     bridge->hwnd = static_cast<HWND>(hwnd_ptr);
     bridge->offset_y = (offset_y > 0) ? offset_y : 48;
+    if (bridge->ready_destroy) {
+        bridge->ready_destroy(bridge->ready_user_data);
+    }
     bridge->ready_cb = ready_cb;
     bridge->ready_user_data = user_data;
+    bridge->ready_destroy = destroy;
 
     fprintf(stderr, "[WebView2 Bridge] initialize called with HWND=%p, offset_y=%d, profile=%s\n",
             bridge->hwnd, offset_y, user_data_dir ? user_data_dir : "(default)");
@@ -367,55 +384,90 @@ void webview2_bridge_free(WebView2Bridge* bridge) {
         if (bridge->com_initialized) {
             CoUninitialize();
         }
+
+        if (bridge->url_destroy) bridge->url_destroy(bridge->url_user_data);
+        if (bridge->title_destroy) bridge->title_destroy(bridge->title_user_data);
+        if (bridge->ready_destroy) bridge->ready_destroy(bridge->ready_user_data);
+        if (bridge->nav_starting_destroy) bridge->nav_starting_destroy(bridge->nav_starting_user_data);
+        if (bridge->nav_completed_destroy) bridge->nav_completed_destroy(bridge->nav_completed_user_data);
+        if (bridge->history_changed_destroy) bridge->history_changed_destroy(bridge->history_changed_user_data);
+
         delete bridge;
     }
 }
 
-void webview2_bridge_set_url_changed_callback(WebView2Bridge* bridge, WebView2URLChangedCallback cb, void* user_data) {
+void webview2_bridge_set_url_changed_callback(WebView2Bridge* bridge, WebView2URLChangedCallback cb, void* user_data, WebView2DestroyNotify destroy) {
     if (bridge) {
+        if (bridge->url_destroy) {
+            bridge->url_destroy(bridge->url_user_data);
+        }
         bridge->url_cb = cb;
         bridge->url_user_data = user_data;
+        bridge->url_destroy = destroy;
     }
 }
 
-void webview2_bridge_set_title_changed_callback(WebView2Bridge* bridge, WebView2TitleChangedCallback cb, void* user_data) {
+void webview2_bridge_set_title_changed_callback(WebView2Bridge* bridge, WebView2TitleChangedCallback cb, void* user_data, WebView2DestroyNotify destroy) {
     if (bridge) {
+        if (bridge->title_destroy) {
+            bridge->title_destroy(bridge->title_user_data);
+        }
         bridge->title_cb = cb;
         bridge->title_user_data = user_data;
+        bridge->title_destroy = destroy;
     }
 }
 
-void webview2_bridge_set_nav_starting_callback(WebView2Bridge* bridge, WebView2NavStartingCallback cb, void* user_data) {
+void webview2_bridge_set_nav_starting_callback(WebView2Bridge* bridge, WebView2NavStartingCallback cb, void* user_data, WebView2DestroyNotify destroy) {
     if (bridge) {
+        if (bridge->nav_starting_destroy) {
+            bridge->nav_starting_destroy(bridge->nav_starting_user_data);
+        }
         bridge->nav_starting_cb = cb;
         bridge->nav_starting_user_data = user_data;
+        bridge->nav_starting_destroy = destroy;
     }
 }
 
-void webview2_bridge_set_nav_completed_callback(WebView2Bridge* bridge, WebView2NavCompletedCallback cb, void* user_data) {
+void webview2_bridge_set_nav_completed_callback(WebView2Bridge* bridge, WebView2NavCompletedCallback cb, void* user_data, WebView2DestroyNotify destroy) {
     if (bridge) {
+        if (bridge->nav_completed_destroy) {
+            bridge->nav_completed_destroy(bridge->nav_completed_user_data);
+        }
         bridge->nav_completed_cb = cb;
         bridge->nav_completed_user_data = user_data;
+        bridge->nav_completed_destroy = destroy;
     }
 }
 
-void webview2_bridge_set_history_changed_callback(WebView2Bridge* bridge, WebView2HistoryChangedCallback cb, void* user_data) {
+void webview2_bridge_set_history_changed_callback(WebView2Bridge* bridge, WebView2HistoryChangedCallback cb, void* user_data, WebView2DestroyNotify destroy) {
     if (bridge) {
+        if (bridge->history_changed_destroy) {
+            bridge->history_changed_destroy(bridge->history_changed_user_data);
+        }
         bridge->history_changed_cb = cb;
         bridge->history_changed_user_data = user_data;
+        bridge->history_changed_destroy = destroy;
     }
 }
 
 void webview2_bridge_set_callbacks(WebView2Bridge* bridge,
                                    WebView2URLChangedCallback url_cb,
                                    void* url_user_data,
+                                   WebView2DestroyNotify url_destroy,
                                    WebView2TitleChangedCallback title_cb,
-                                   void* title_user_data) {
+                                   void* title_user_data,
+                                   WebView2DestroyNotify title_destroy) {
     if (bridge) {
+        if (bridge->url_destroy) bridge->url_destroy(bridge->url_user_data);
         bridge->url_cb = url_cb;
         bridge->url_user_data = url_user_data;
+        bridge->url_destroy = url_destroy;
+
+        if (bridge->title_destroy) bridge->title_destroy(bridge->title_user_data);
         bridge->title_cb = title_cb;
         bridge->title_user_data = title_user_data;
+        bridge->title_destroy = title_destroy;
     }
 }
 

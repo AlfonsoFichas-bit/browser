@@ -29,26 +29,26 @@ namespace WebView2 {
         public Bridge ();
 
         [CCode (cname = "webview2_bridge_initialize", instance_pos = 0.1)]
-        public void initialize (void* hwnd, int offset_y, string? user_data_dir, [CCode (scope = "async")] InitReadyCallback ready_cb);
+        public void initialize (void* hwnd, int offset_y, string? user_data_dir, [CCode (scope = "notified")] InitReadyCallback ready_cb);
 
         [CCode (cname = "webview2_bridge_set_url_changed_callback", instance_pos = 0.1)]
-        public void set_url_changed_callback ([CCode (scope = "async")] URLChangedCallback url_cb);
+        public void set_url_changed_callback ([CCode (scope = "notified")] URLChangedCallback url_cb);
 
         [CCode (cname = "webview2_bridge_set_title_changed_callback", instance_pos = 0.1)]
-        public void set_title_changed_callback ([CCode (scope = "async")] TitleChangedCallback title_cb);
+        public void set_title_changed_callback ([CCode (scope = "notified")] TitleChangedCallback title_cb);
 
         [CCode (cname = "webview2_bridge_set_nav_starting_callback", instance_pos = 0.1)]
-        public void set_nav_starting_callback ([CCode (scope = "async")] NavStartingCallback nav_cb);
+        public void set_nav_starting_callback ([CCode (scope = "notified")] NavStartingCallback nav_cb);
 
         [CCode (cname = "webview2_bridge_set_nav_completed_callback", instance_pos = 0.1)]
-        public void set_nav_completed_callback ([CCode (scope = "async")] NavCompletedCallback nav_cb);
+        public void set_nav_completed_callback ([CCode (scope = "notified")] NavCompletedCallback nav_cb);
 
         [CCode (cname = "webview2_bridge_set_history_changed_callback", instance_pos = 0.1)]
-        public void set_history_changed_callback ([CCode (scope = "async")] HistoryChangedCallback hist_cb);
+        public void set_history_changed_callback ([CCode (scope = "notified")] HistoryChangedCallback hist_cb);
 
         [CCode (cname = "webview2_bridge_set_callbacks", instance_pos = 0.1)]
-        public void set_callbacks ([CCode (scope = "async")] URLChangedCallback url_cb,
-                                   [CCode (scope = "async")] TitleChangedCallback title_cb);
+        public void set_callbacks ([CCode (scope = "notified")] URLChangedCallback url_cb,
+                                   [CCode (scope = "notified")] TitleChangedCallback title_cb);
 
         [CCode (cname = "webview2_bridge_navigate", instance_pos = 0.1)]
         public void navigate (string url);
