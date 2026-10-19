@@ -177,5 +177,131 @@ int main(string[] args) {
         }
     });
 
+    Test.add_func("/plist/writer-roundtrip", () => {
+        // parse → write → parse debe ser estable en TODOS los plists binarios
+        // (los XML — Defaults/UserAgents — aún no los escribe el writer)
+        string[] files = {
+            "Bookmarks.plist", "History.plist", "TopSites.plist",
+            "ReadingList.plist"
+        };
+        foreach (var f in files) {
+            Variant v;
+            try {
+                v = Plist.parse_file(Path.build_filename(fixtures_dir, f));
+            } catch (Error e) {
+                error("%s: parse fallo: %s", f, e.message);
+            }
+            uint8[] bytes;
+            try {
+                bytes = PlistWriter.to_bytes(v);
+            } catch (Error e) {
+                error("%s: escritura fallo: %s", f, e.message);
+            }
+            // TEMP DEBUG
+            try { FileUtils.set_data("/tmp/rt-" + f, bytes); } catch (Error e) {}
+            Variant w;
+            try {
+                w = Plist.parse_bytes(bytes);
+            } catch (Error e) {
+                error("%s: reparse fallo: %s", f, e.message);
+            }
+            // comparación profunda vía representación GVariant
+            assert(v.print(true) == w.print(true));
+        }
+    });
+
+    Test.add_func("/plist/writer-tipos", () => {
+        // Casos de borde del escritor: UTF-16 (no ASCII), strings largos
+        // (>=15, conteo extendido), ints de todos los tamaños, bools,
+        // data, arrays y dicts anidados.
+        var root = new VariantBuilder(new VariantType("a{sv}"));
+        root.add("{sv}", "ascii", new Variant.string("hola"));
+        root.add("{sv}", "unicode", new Variant.string("Ñandú 日本 🦩"));
+        root.add("{sv}", "largo", new Variant.string(string.nfill(40, 'x')));
+        root.add("{sv}", "int0", new Variant.int64(0));
+        root.add("{sv}", "int8", new Variant.int64(200));       // 2 B
+        root.add("{sv}", "int-neg", new Variant.int64(-12345)); // 2 B
+        root.add("{sv}", "int32", new Variant.int64(70000));    // 4 B
+        root.add("{sv}", "int64", new Variant.int64(1 << 40));
+        root.add("{sv}", "real", new Variant.double(3.14159));
+        root.add("{sv}", "si", new Variant.boolean(true));
+        root.add("{sv}", "no", new Variant.boolean(false));
+        root.add("{sv}", "null",
+                 new Variant.maybe(new VariantType("v"), null)); // -> 0x00
+        var arr = new VariantBuilder(new VariantType("av"));
+        for (int i = 0; i < 40; i++) // array largo -> count extendido
+            arr.add_value(new Variant.int64(i));
+        root.add("{sv}", "array", arr.end());
+        uint8[] payload = { 0xDE, 0xAD, 0xBE, 0xEF };
+        root.add("{sv}", "bytes",
+                 new Variant.from_bytes(new VariantType("ay"),
+                                        new Bytes.take(payload), true));
+        var src = root.end();
+
+        uint8[] bytes;
+        try {
+            bytes = PlistWriter.to_bytes(src);
+        } catch (Error e) {
+            error("escritura fallo: %s", e.message);
+        }
+        Variant back;
+        try {
+            back = Plist.parse_bytes(bytes);
+        } catch (Error e) {
+            error("reparse fallo: %s", e.message);
+        }
+        assert(src.print(true) == back.print(true));
+
+        // el parser de Safari debe dar igual: comprobación cruzada de claves
+        assert(back.lookup_value("unicode", VariantType.STRING)
+                   .get_string() == "Ñandú 日本 🦩");
+        assert(back.lookup_value("array", new VariantType("av"))
+                   .n_children() == 40);
+        assert(back.lookup_value("int-neg", VariantType.INT64)
+                   .get_int64() == -12345);
+    });
+
+    Test.add_func("/history/save-load", () => {
+        var s = new Baobabs.History.Store();
+        s.record_visit("https://example.com/", "Ejemplo");
+        s.record_visit("https://example.com/", "Ejemplo");
+        s.record_visit("https://otro.example/página", "Otro");
+
+        string path;
+        try {
+            // fd queda abierto a propósito: solo lo usa este test efímero
+            FileUtils.open_tmp("baobabs-hist-XXXXXX", out path);
+        } catch (Error e) {
+            error("tmp fallo: %s", e.message);
+        }
+        try {
+            s.save_to_file(path);
+        } catch (Error e) {
+            error("save fallo: %s", e.message);
+        }
+
+        var s2 = new Baobabs.History.Store();
+        s2.load_from_file(path);
+        assert(s2.entries.size == 2);
+        var e1 = s2.entries.get("https://example.com/");
+        assert(e1 != null);
+        assert(e1.visit_count == 2);
+        assert(e1.title == "Ejemplo");
+        assert(e1.last_visited_unix > 1792000000); // > 2026-10
+        // epoch Cocoa coherente: unix - offset
+        assert(e1.last_visited_cocoa ==
+               (double)(e1.last_visited_unix - COCOA_EPOCH_OFFSET));
+        var e2 = s2.entries.get("https://otro.example/página");
+        assert(e2 != null);
+        assert(e2.visit_count == 1);
+        assert(e2.title == "Otro");
+        FileUtils.remove(path);
+
+        // fichero ausente = historial vacío, sin lanzar
+        var s3 = new Baobabs.History.Store();
+        s3.load_from_file("/no/existe/baobabs/History.plist");
+        assert(s3.entries.size == 0);
+    });
+
     return Test.run();
 }

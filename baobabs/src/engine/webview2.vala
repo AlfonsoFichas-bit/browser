@@ -1,5 +1,8 @@
-// Stub para WebView2 backend (Windows-first)
-// Se implementará cuando tengamos el entorno WebView2 + VAPI adecuado
+// Stub para WebView2 backend (Windows, fase 4)
+// Se implementará con el shim C++ (WebView2.h + carga dinámica de
+// WebView2Loader.dll) exponiendo una API C plana → VAPI.
+// NOTA: la UI de Windows (Win32 nativo vs GTK4) se decide en la fase 4;
+// gtk4 no puede embeber HWNDs, así que get_widget() aquí es provisional.
 
 namespace Baobabs {
     public class WebView2Engine : GLib.Object, BrowserEngine {
@@ -17,8 +20,21 @@ namespace Baobabs {
         public bool can_reload { get { return _can_reload; } }
         public bool can_stop { get { return _can_stop; } }
 
+        private Gtk.Label placeholder;
+
         public WebView2Engine() {
             Object();
+        }
+
+        construct {
+            placeholder = new Gtk.Label(
+                "Backend WebView2 (fase 4) — no disponible en esta plataforma");
+            placeholder.margin_top = 24;
+            placeholder.margin_bottom = 24;
+        }
+
+        public Gtk.Widget get_widget() {
+            return placeholder;
         }
 
         public void go_back() {}
@@ -29,5 +45,10 @@ namespace Baobabs {
         public void execute_script(string js) {}
         public void set_user_agent(string ua) {}
         public void focus() {}
+    }
+
+    // Fábrica del backend (solo se compila este fichero si NO hay WebKitGTK)
+    public BrowserEngine create_engine() {
+        return new WebView2Engine();
     }
 }

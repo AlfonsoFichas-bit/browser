@@ -15,16 +15,15 @@ gtk4_dep     = dependency('gtk4', version: '>= 4.10')
 gee_dep      = dependency('gee-0.8')
 
 # --- Motor web intercambiable -------------------------------------------------
-# Windows-first: WebView2 (cargado dinámicamente, sin dependencia de build).
-# Linux futuro: WebKitGTK (detectado aquí cuando exista).
-webkitgtk_dep = disabler()
+# Linux: WebKitGTK 6 (GTK4) es OBLIGATORIO. El antiguo fallback webkit2gtk-4.1
+# se eliminó a propósito: es GTK3 y no se puede embeber en una ventana GTK4.
+# Windows (fase 4): WebView2 via stub condicional en src/meson.build.
+webkitgtk_dep = dependency('webkitgtk-6.0', version: '>= 2.42',
+                           required: host_machine.system() == 'linux')
 
-if host_machine.system() == 'linux'
-  webkitgtk_dep = dependency('webkitgtk-6.0', version: '>= 2.42', required: false)
-  if not webkitgtk_dep.found()
-    webkitgtk_dep = dependency('webkit2gtk-4.1', version: '>= 2.42', required: false)
-  endif
-endif
+# --- UI: Granite (librería de widgets de elementary OS, opcional) ------------
+# Si está, se define el símbolo HAVE_GRANITE para los #if de Vala.
+granite_dep = dependency('granite-7', required: false)
 
 # --- Dependencias opcionales por fase ----------------------------------------
 sqlite_dep    = dependency('sqlite3', required: false)
@@ -34,6 +33,14 @@ libsoup_dep   = dependency('libsoup-3.0', required: false)
 baobabs_deps = [glib_dep, gobject_dep, gio_dep, gtk4_dep, gee_dep]
 if webkitgtk_dep.found()
   baobabs_deps += webkitgtk_dep
+endif
+if granite_dep.found()
+  baobabs_deps += granite_dep
+endif
+
+vala_args = []
+if granite_dep.found()
+  vala_args += ['--define=HAVE_GRANITE']
 endif
 
 subdir('src')

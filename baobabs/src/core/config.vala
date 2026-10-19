@@ -18,5 +18,23 @@ namespace Baobabs {
             this.profile_dir = Path.build_filename(this.data_dir, "default");
             DirUtils.create_with_parents(this.profile_dir, 0755);
         }
+
+        // Mismos nombres de fichero que el perfil de Safari 5.1
+        // (HABITAT.md 1.1): el mismo esquema, directorio propio de Baobabs.
+        public string history_path {
+            owned get { return Path.build_filename(profile_dir, "History.plist"); }
+        }
+
+        public string bookmarks_path {
+            owned get { return Path.build_filename(profile_dir, "Bookmarks.plist"); }
+        }
+
+        public string topsites_path {
+            owned get { return Path.build_filename(profile_dir, "TopSites.plist"); }
+        }
+
+        public string reading_list_path {
+            owned get { return Path.build_filename(profile_dir, "ReadingList.plist"); }
+        }
     }
 }

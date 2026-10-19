@@ -105,7 +105,13 @@ namespace Baobabs {
                     return new Variant.boolean(false);
                 if (info == 0x9)
                     return new Variant.boolean(true);
-                return new Variant.maybe(null, null);
+                if (info == 0x0) {
+                    // maybe vacío = "null"; se representa como "mv"
+                    // (maybe de variant sin hijo), que el writer emite como 0x00
+                    return new Variant.maybe(new VariantType("v"), null);
+                }
+                throw new PlistError.INVALID_FORMAT(
+                    "marcador simple desconocido: %#02x", marker);
             case 0x1: // entero con signo big-endian, 2^info bytes
                 int size = 1 << info;
                 if (size == 16) {
