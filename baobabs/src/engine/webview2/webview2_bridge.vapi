@@ -29,26 +29,26 @@ namespace WebView2 {
         public Bridge ();
 
         [CCode (cname = "webview2_bridge_initialize", instance_pos = 0.1)]
-        public void initialize (void* hwnd, int offset_y, string? user_data_dir, [CCode (scope = "notified")] InitReadyCallback ready_cb);
+        public void initialize (void* hwnd, int offset_y, string? user_data_dir, [CCode (delegate_target_pos = 4.1, destroy_notify_pos = 4.2)] owned InitReadyCallback ready_cb);
 
         [CCode (cname = "webview2_bridge_set_url_changed_callback", instance_pos = 0.1)]
-        public void set_url_changed_callback ([CCode (scope = "notified")] URLChangedCallback url_cb);
+        public void set_url_changed_callback ([CCode (delegate_target_pos = 1.1, destroy_notify_pos = 1.2)] owned URLChangedCallback url_cb);
 
         [CCode (cname = "webview2_bridge_set_title_changed_callback", instance_pos = 0.1)]
-        public void set_title_changed_callback ([CCode (scope = "notified")] TitleChangedCallback title_cb);
+        public void set_title_changed_callback ([CCode (delegate_target_pos = 1.1, destroy_notify_pos = 1.2)] owned TitleChangedCallback title_cb);
 
         [CCode (cname = "webview2_bridge_set_nav_starting_callback", instance_pos = 0.1)]
-        public void set_nav_starting_callback ([CCode (scope = "notified")] NavStartingCallback nav_cb);
+        public void set_nav_starting_callback ([CCode (delegate_target_pos = 1.1, destroy_notify_pos = 1.2)] owned NavStartingCallback nav_cb);
 
         [CCode (cname = "webview2_bridge_set_nav_completed_callback", instance_pos = 0.1)]
-        public void set_nav_completed_callback ([CCode (scope = "notified")] NavCompletedCallback nav_cb);
+        public void set_nav_completed_callback ([CCode (delegate_target_pos = 1.1, destroy_notify_pos = 1.2)] owned NavCompletedCallback nav_cb);
 
         [CCode (cname = "webview2_bridge_set_history_changed_callback", instance_pos = 0.1)]
-        public void set_history_changed_callback ([CCode (scope = "notified")] HistoryChangedCallback hist_cb);
+        public void set_history_changed_callback ([CCode (delegate_target_pos = 1.1, destroy_notify_pos = 1.2)] owned HistoryChangedCallback hist_cb);
 
         [CCode (cname = "webview2_bridge_set_callbacks", instance_pos = 0.1)]
-        public void set_callbacks ([CCode (scope = "notified")] URLChangedCallback url_cb,
-                                   [CCode (scope = "notified")] TitleChangedCallback title_cb);
+        public void set_callbacks ([CCode (delegate_target_pos = 1.1, destroy_notify_pos = 1.2)] owned URLChangedCallback url_cb,
+                                   [CCode (delegate_target_pos = 2.1, destroy_notify_pos = 2.2)] owned TitleChangedCallback title_cb);
 
         [CCode (cname = "webview2_bridge_navigate", instance_pos = 0.1)]
         public void navigate (string url);
