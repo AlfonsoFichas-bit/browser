@@ -9,6 +9,7 @@
 #include <string>
 #include <locale>
 #include <codecvt>
+#include <cstdio>
 
 using namespace Microsoft::WRL;
 
@@ -56,6 +57,7 @@ struct WebView2Bridge {
     EventRegistrationToken navStartingToken = {};
     EventRegistrationToken navCompletedToken = {};
     EventRegistrationToken historyChangedToken = {};
+    EventRegistrationToken newWindowRequestedToken = {};
 
     WebView2Bridge()
         : hwnd(nullptr),
@@ -74,13 +76,25 @@ struct WebView2Bridge {
           history_changed_user_data(nullptr),
           com_initialized(false) {}
 
-    void UpdateBounds(int width, int height) {
-        if (webviewController) {
+    void UpdateBounds(int logical_w, int logical_h) {
+        if (webviewController && hwnd) {
+            RECT clientRect;
+            GetClientRect(hwnd, &clientRect);
+
+            int phys_width = clientRect.right - clientRect.left;
+            int phys_height = clientRect.bottom - clientRect.top;
+
+            int phys_offset_y = offset_y;
+            if (logical_h > 0 && phys_height > 0) {
+                double scale = static_cast<double>(phys_height) / static_cast<double>(logical_h);
+                phys_offset_y = static_cast<int>(offset_y * scale);
+            }
+
             RECT bounds;
             bounds.left = 0;
-            bounds.top = offset_y;
-            bounds.right = width;
-            bounds.bottom = height;
+            bounds.top = phys_offset_y;
+            bounds.right = phys_width;
+            bounds.bottom = phys_height;
             webviewController->put_Bounds(bounds);
         }
     }
@@ -108,14 +122,24 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
                                 const char* user_data_dir,
                                 WebView2InitReadyCallback ready_cb,
                                 void* user_data) {
-    if (!bridge) return;
+    if (!bridge) {
+        fprintf(stderr, "[WebView2 Bridge] ERROR: initialize called with NULL bridge!\n");
+        fflush(stderr);
+        return;
+    }
     bridge->hwnd = static_cast<HWND>(hwnd_ptr);
     bridge->offset_y = offset_y;
     bridge->ready_cb = ready_cb;
     bridge->ready_user_data = user_data;
 
+    fprintf(stderr, "[WebView2 Bridge] initialize called with HWND=%p, offset_y=%d, profile=%s\n",
+            bridge->hwnd, offset_y, user_data_dir ? user_data_dir : "(default)");
+    fflush(stderr);
+
     // Inicializar COM en el hilo de interfaz (STA)
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    fprintf(stderr, "[WebView2 Bridge] CoInitializeEx result: 0x%08lX\n", (unsigned long)hr);
+    fflush(stderr);
     if (SUCCEEDED(hr)) {
         bridge->com_initialized = true;
     }
@@ -127,19 +151,39 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
     LPCWSTR pUserDataFolder = wUserDataFolder.empty() ? nullptr : wUserDataFolder.c_str();
 
     // 1. Crear el entorno CoreWebView2
-    CreateCoreWebView2EnvironmentWithOptions(nullptr, pUserDataFolder, nullptr,
+    HRESULT hrEnvCall = CreateCoreWebView2EnvironmentWithOptions(nullptr, pUserDataFolder, nullptr,
         Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
             [bridge](HRESULT result, ICoreWebView2Environment* env) -> HRESULT {
-                if (FAILED(result) || !env) return E_FAIL;
+                fprintf(stderr, "[WebView2 Bridge] Environment callback: result=0x%08lX, env=%p\n", (unsigned long)result, env);
+                fflush(stderr);
+                if (FAILED(result) || !env) {
+                    fprintf(stderr, "[WebView2 Bridge] ERROR: Failed to create Environment! HRESULT: 0x%08lX\n", (unsigned long)result);
+                    fflush(stderr);
+                    return E_FAIL;
+                }
 
                 // 2. Crear el controlador CoreWebView2
-                env->CreateCoreWebView2Controller(bridge->hwnd,
+                HRESULT hrCtrlCall = env->CreateCoreWebView2Controller(bridge->hwnd,
                     Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
                         [bridge](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT {
-                            if (FAILED(result) || !controller) return E_FAIL;
+                            fprintf(stderr, "[WebView2 Bridge] Controller callback: result=0x%08lX, controller=%p\n", (unsigned long)result, controller);
+                            fflush(stderr);
+                            if (FAILED(result) || !controller) {
+                                fprintf(stderr, "[WebView2 Bridge] ERROR: Failed to create Controller! HRESULT: 0x%08lX\n", (unsigned long)result);
+                                fflush(stderr);
+                                return E_FAIL;
+                            }
 
                             bridge->webviewController = controller;
                             controller->get_CoreWebView2(&bridge->webview);
+
+                            // Ajustes de configuración del motor
+                            ComPtr<ICoreWebView2Settings> settings;
+                            if (SUCCEEDED(bridge->webview->get_Settings(&settings)) && settings) {
+                                settings->put_IsScriptEnabled(TRUE);
+                                settings->put_AreDefaultScriptDialogsEnabled(TRUE);
+                                settings->put_IsWebMessageEnabled(TRUE);
+                            }
 
                             // Evento: Cambio de URL fuente
                             bridge->webview->add_SourceChanged(
@@ -213,13 +257,28 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
                                         return S_OK;
                                     }).Get(), &bridge->historyChangedToken);
 
-                            // Bounds iniciales
-                            RECT clientRect;
-                            GetClientRect(bridge->hwnd, &clientRect);
-                            bridge->UpdateBounds(clientRect.right, clientRect.bottom);
+                            // Evento: Enlaces que solicitan ventana nueva (target="_blank")
+                            bridge->webview->add_NewWindowRequested(
+                                Callback<ICoreWebView2NewWindowRequestedEventHandler>(
+                                    [bridge](ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args) -> HRESULT {
+                                        LPWSTR uri = nullptr;
+                                        args->get_Uri(&uri);
+                                        if (uri) {
+                                            sender->Navigate(uri);
+                                            CoTaskMemFree(uri);
+                                        }
+                                        args->put_Handled(TRUE);
+                                        return S_OK;
+                                    }).Get(), &bridge->newWindowRequestedToken);
+
+                            // Bounds iniciales adaptados al tamaño de la ventana
+                            bridge->UpdateBounds(0, 0);
 
                             // Visibilidad
                             controller->put_IsVisible(TRUE);
+
+                            fprintf(stderr, "[WebView2 Bridge] Initialization SUCCESSFUL! Controller is visible.\n");
+                            fflush(stderr);
 
                             if (bridge->ready_cb) {
                                 bridge->ready_cb(bridge->ready_user_data);
@@ -227,8 +286,18 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
 
                             return S_OK;
                         }).Get());
+
+                if (FAILED(hrCtrlCall)) {
+                    fprintf(stderr, "[WebView2 Bridge] CreateCoreWebView2Controller call returned: 0x%08lX\n", (unsigned long)hrCtrlCall);
+                    fflush(stderr);
+                }
                 return S_OK;
             }).Get());
+
+    if (FAILED(hrEnvCall)) {
+        fprintf(stderr, "[WebView2 Bridge] CreateCoreWebView2EnvironmentWithOptions call returned: 0x%08lX\n", (unsigned long)hrEnvCall);
+        fflush(stderr);
+    }
 }
 
 void webview2_bridge_free(WebView2Bridge* bridge) {
@@ -239,6 +308,7 @@ void webview2_bridge_free(WebView2Bridge* bridge) {
             bridge->webview->remove_NavigationStarting(bridge->navStartingToken);
             bridge->webview->remove_NavigationCompleted(bridge->navCompletedToken);
             bridge->webview->remove_HistoryChanged(bridge->historyChangedToken);
+            bridge->webview->remove_NewWindowRequested(bridge->newWindowRequestedToken);
             bridge->webview = nullptr;
         }
         if (bridge->webviewController) {
@@ -301,9 +371,13 @@ void webview2_bridge_set_callbacks(WebView2Bridge* bridge,
 }
 
 void webview2_bridge_navigate(WebView2Bridge* bridge, const char* url) {
+    fprintf(stderr, "[WebView2 Bridge] navigate requested: %s\n", url ? url : "(null)");
+    fflush(stderr);
     if (bridge && bridge->webview && url) {
         std::wstring wurl = utf8_to_wstring(url);
-        bridge->webview->Navigate(wurl.c_str());
+        HRESULT hr = bridge->webview->Navigate(wurl.c_str());
+        fprintf(stderr, "[WebView2 Bridge] webview->Navigate returned: 0x%08lX\n", (unsigned long)hr);
+        fflush(stderr);
     }
 }
 

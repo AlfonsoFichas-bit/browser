@@ -9,12 +9,16 @@ namespace Baobabs {
         private Button reload_btn;
         private DrawingArea web_area;
         private bool is_loading = false;
+        private string default_url;
 
-        public MainWindow(Gtk.Application app) {
+        public MainWindow(Gtk.Application app, string? initial_url = null) {
             Object(application: app,
                    title: "Baobabs",
                    default_width: 1100,
                    default_height: 750);
+            this.default_url = (initial_url != null && initial_url.length > 0)
+                ? initial_url
+                : "https://duckduckgo.com";
         }
 
         construct {
@@ -112,20 +116,24 @@ namespace Baobabs {
                 engine.set_offset_y(offset_y);
                 engine.resize(win_w, win_h);
             });
+        }
 
-            // Inicialización de la ventana nativa (HWND) al realizar el área web
-            web_area.realize.connect(() => {
-                void* hwnd = WebView2.get_widget_hwnd(this);
-                if (hwnd != null) {
-                    int win_h = this.get_height();
-                    int area_h = web_area.get_height();
-                    int offset_y = (win_h > area_h && area_h > 0) ? (win_h - area_h) : 48;
-                    string profile = Config.get_instance().profile_dir;
+        public void start() {
+            void* hwnd = WebView2.get_widget_hwnd(this);
+            stderr.printf("[MainWindow] start() called. Window HWND: %p\n", hwnd);
+            if (hwnd != null) {
+                int win_h = this.get_height();
+                int area_h = web_area.get_height();
+                int offset_y = (win_h > area_h && area_h > 0) ? (win_h - area_h) : 48;
+                string profile = Config.get_instance().profile_dir;
 
-                    engine.initialize(hwnd, offset_y, profile);
-                    engine.load_uri("https://duckduckgo.com");
-                }
-            });
+                stderr.printf("[MainWindow] Initializing engine with HWND=%p, offset_y=%d, profile=%s\n",
+                              hwnd, offset_y, profile);
+                engine.initialize(hwnd, offset_y, profile);
+                engine.load_uri(this.default_url);
+            } else {
+                stderr.printf("[MainWindow] ERROR: Failed to retrieve HWND for MainWindow!\n");
+            }
         }
 
         private void on_url_activated() {
