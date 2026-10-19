@@ -1,3 +1,11 @@
+if is_windows
+  configure_file(
+    input: meson.project_source_root() / 'deps/webview2/pkg/runtimes/win-x64/native/WebView2Loader.dll',
+    output: 'WebView2Loader.dll',
+    copy: true,
+  )
+endif
+
 # Tests (epoch conversion, uuid, bookmarks model)
 test_epoch = executable('test-epoch',
   files('test_epoch.vala'),

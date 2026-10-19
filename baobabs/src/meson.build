@@ -12,9 +12,31 @@ baobabs_core_sources = files(
   'history/model.vala',
 )
 
-# Libreria compartida: la enlazan el ejecutable y los tests
+extra_includes = [include_directories('.')]
+
+if is_windows
+  baobabs_core_sources += files(
+    'engine/webview2/webview2_bridge.vapi',
+    'engine/webview2/webview2_bridge.cpp',
+    'engine/webview2/webview2_bridge_helper.c',
+  )
+  extra_includes += include_directories(
+    '../deps/webview2/pkg/build/native/include',
+    'engine/webview2',
+  )
+
+  # Copiar WebView2Loader.dll junto al ejecutable en el directorio de salida
+  configure_file(
+    input: meson.project_source_root() / 'deps/webview2/pkg/runtimes/win-x64/native/WebView2Loader.dll',
+    output: 'WebView2Loader.dll',
+    copy: true,
+  )
+endif
+
+# Libreria estatica: la enlazan el ejecutable y los tests
 baobabs_core = static_library('baobabs-core',
   baobabs_core_sources,
+  include_directories: extra_includes,
   dependencies: baobabs_deps,
 )
 
@@ -22,7 +44,7 @@ baobabs_core = static_library('baobabs-core',
 baobabs_core_dep = declare_dependency(
   link_with: baobabs_core,
   dependencies: baobabs_deps,
-  include_directories: include_directories('.'),
+  include_directories: extra_includes,
 )
 
 executable('baobabs',
