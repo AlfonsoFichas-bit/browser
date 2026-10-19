@@ -1,7 +1,8 @@
 @echo off
 set "PATH=C:\msys64\ucrt64\bin;%PATH%"
+cd /d "%~dp0baobabs\builddir\src"
 if "%~1"=="" (
-    start "" "%~dp0baobabs\builddir\src\baobabs.exe"
+    start "" "baobabs.exe"
 ) else (
-    start "" "%~dp0baobabs\builddir\src\baobabs.exe" "%~1"
+    start "" "baobabs.exe" "%~1"
 )

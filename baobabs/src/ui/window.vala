@@ -9,16 +9,19 @@ namespace Baobabs {
         private Button reload_btn;
         private DrawingArea web_area;
         private bool is_loading = false;
-        private string default_url;
+        private string default_url = "https://duckduckgo.com";
 
         public MainWindow(Gtk.Application app, string? initial_url = null) {
             Object(application: app,
                    title: "Baobabs",
                    default_width: 1100,
                    default_height: 750);
-            this.default_url = (initial_url != null && initial_url.length > 0)
-                ? initial_url
-                : "https://duckduckgo.com";
+            if (initial_url != null && initial_url.length > 0) {
+                this.default_url = initial_url;
+            }
+            if (url_entry != null) {
+                url_entry.text = this.default_url;
+            }
         }
 
         construct {
@@ -62,6 +65,7 @@ namespace Baobabs {
             url_entry = new Entry();
             url_entry.hexpand = true;
             url_entry.placeholder_text = "Buscar o introducir dirección web";
+            url_entry.text = this.default_url;
             url_entry.activate.connect(on_url_activated);
             header.set_title_widget(url_entry);
 
@@ -70,15 +74,18 @@ namespace Baobabs {
             web_area.hexpand = true;
             web_area.vexpand = true;
 
+            // Función de dibujado vacía para evitar que GTK pinte fondos opacos sobre WebView2
+            web_area.set_draw_func((area, cr, width, height) => {
+                // No dibujar nada
+            });
+
             var box = new Box(Orientation.VERTICAL, 0);
             box.append(web_area);
             set_child(box);
 
             // Conectar eventos del motor
             engine.url_changed.connect((new_url) => {
-                if (!url_entry.has_focus) {
-                    url_entry.text = new_url;
-                }
+                url_entry.text = new_url;
             });
 
             engine.title_changed.connect((new_title) => {
@@ -110,12 +117,17 @@ namespace Baobabs {
 
             // Redimensionamiento del WebView2 coordinado con el widget GTK
             web_area.resize.connect((w, h) => {
-                int win_w = this.get_width();
-                int win_h = this.get_height();
-                int offset_y = int.max(0, win_h - h);
-                engine.set_offset_y(offset_y);
-                engine.resize(win_w, win_h);
+                update_webview_size();
             });
+        }
+
+        private void update_webview_size() {
+            int win_w = this.get_width();
+            int win_h = this.get_height();
+            int area_h = web_area.get_height();
+            int offset_y = (win_h > area_h && area_h > 0) ? (win_h - area_h) : 48;
+            engine.set_offset_y(offset_y);
+            engine.resize(win_w, win_h);
         }
 
         public void start() {
@@ -131,6 +143,20 @@ namespace Baobabs {
                               hwnd, offset_y, profile);
                 engine.initialize(hwnd, offset_y, profile);
                 engine.load_uri(this.default_url);
+
+                // Ajustar tamaños de forma garantizada tras la renderización inicial del layout GTK
+                GLib.Timeout.add(200, () => {
+                    update_webview_size();
+                    return false;
+                });
+                GLib.Timeout.add(600, () => {
+                    update_webview_size();
+                    return false;
+                });
+                GLib.Timeout.add(1200, () => {
+                    update_webview_size();
+                    return false;
+                });
             } else {
                 stderr.printf("[MainWindow] ERROR: Failed to retrieve HWND for MainWindow!\n");
             }

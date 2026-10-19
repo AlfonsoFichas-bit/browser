@@ -61,7 +61,7 @@ struct WebView2Bridge {
 
     WebView2Bridge()
         : hwnd(nullptr),
-          offset_y(0),
+          offset_y(48),
           url_cb(nullptr),
           url_user_data(nullptr),
           title_cb(nullptr),
@@ -85,17 +85,41 @@ struct WebView2Bridge {
             int phys_height = clientRect.bottom - clientRect.top;
 
             int phys_offset_y = offset_y;
-            if (logical_h > 0 && phys_height > 0) {
+            if (logical_h > 0 && phys_height > 0 && logical_h != phys_height) {
                 double scale = static_cast<double>(phys_height) / static_cast<double>(logical_h);
                 phys_offset_y = static_cast<int>(offset_y * scale);
             }
+
+            // Fallback razonable si la ventana aún no tiene dimensiones finales
+            if (phys_width <= 0) phys_width = 1100;
+            if (phys_height <= phys_offset_y) phys_height = 750;
 
             RECT bounds;
             bounds.left = 0;
             bounds.top = phys_offset_y;
             bounds.right = phys_width;
             bounds.bottom = phys_height;
-            webviewController->put_Bounds(bounds);
+
+            HRESULT hr = webviewController->put_Bounds(bounds);
+            webviewController->put_IsVisible(TRUE);
+
+            fprintf(stderr, "[WebView2 Bridge] UpdateBounds: left=%ld top=%ld right=%ld bottom=%ld (put_Bounds: 0x%08lX)\n",
+                    bounds.left, bounds.top, bounds.right, bounds.bottom, (unsigned long)hr);
+            fflush(stderr);
+
+            // Asegurar que el HWND hijo de WebView2 se mantenga en el tope del Z-order
+            EnumChildWindows(hwnd, [](HWND child, LPARAM) -> BOOL {
+                char cls[256] = {0};
+                GetClassNameA(child, cls, sizeof(cls));
+                RECT r;
+                GetWindowRect(child, &r);
+                BOOL vis = IsWindowVisible(child);
+                fprintf(stderr, "  [Child HWND %p] class='%s' visible=%d rect=[%ld,%ld,%ld,%ld]\n",
+                        child, cls, vis, r.left, r.top, r.right, r.bottom);
+                SetWindowPos(child, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
+                return TRUE;
+            }, 0);
+            fflush(stderr);
         }
     }
 
@@ -128,13 +152,27 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
         return;
     }
     bridge->hwnd = static_cast<HWND>(hwnd_ptr);
-    bridge->offset_y = offset_y;
+    bridge->offset_y = (offset_y > 0) ? offset_y : 48;
     bridge->ready_cb = ready_cb;
     bridge->ready_user_data = user_data;
 
     fprintf(stderr, "[WebView2 Bridge] initialize called with HWND=%p, offset_y=%d, profile=%s\n",
             bridge->hwnd, offset_y, user_data_dir ? user_data_dir : "(default)");
     fflush(stderr);
+
+    // Activar WS_CLIPCHILDREN en la ventana padre de GTK para evitar que el repintado
+    // de GTK dibuje encima del HWND hijo de WebView2
+    if (bridge->hwnd) {
+        LONG_PTR style = GetWindowLongPtr(bridge->hwnd, GWL_STYLE);
+        if (!(style & WS_CLIPCHILDREN)) {
+            SetWindowLongPtr(bridge->hwnd, GWL_STYLE, style | WS_CLIPCHILDREN);
+            SetWindowPos(bridge->hwnd, NULL, 0, 0, 0, 0,
+                         SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+            fprintf(stderr, "[WebView2 Bridge] Added WS_CLIPCHILDREN to parent HWND (was 0x%08lX, now 0x%08lX)\n",
+                    (unsigned long)style, (unsigned long)(style | WS_CLIPCHILDREN));
+            fflush(stderr);
+        }
+    }
 
     // Inicializar COM en el hilo de interfaz (STA)
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -194,6 +232,8 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
                                             sender->get_Source(&uri);
                                             if (uri) {
                                                 std::string utf8_uri = wstring_to_utf8(uri);
+                                                fprintf(stderr, "[WebView2 Bridge] SourceChanged: %s\n", utf8_uri.c_str());
+                                                fflush(stderr);
                                                 bridge->url_cb(utf8_uri.c_str(), bridge->url_user_data);
                                                 CoTaskMemFree(uri);
                                             }
@@ -211,6 +251,8 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
                                             sender->get_DocumentTitle(&title);
                                             if (title) {
                                                 std::string utf8_title = wstring_to_utf8(title);
+                                                fprintf(stderr, "[WebView2 Bridge] DocumentTitleChanged: %s\n", utf8_title.c_str());
+                                                fflush(stderr);
                                                 bridge->title_cb(utf8_title.c_str(), bridge->title_user_data);
                                                 CoTaskMemFree(title);
                                             }
@@ -227,6 +269,8 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
                                             args->get_Uri(&uri);
                                             if (uri) {
                                                 std::string utf8_uri = wstring_to_utf8(uri);
+                                                fprintf(stderr, "[WebView2 Bridge] NavigationStarting: %s\n", utf8_uri.c_str());
+                                                fflush(stderr);
                                                 bridge->nav_starting_cb(utf8_uri.c_str(), bridge->nav_starting_user_data);
                                                 CoTaskMemFree(uri);
                                             }
@@ -239,9 +283,14 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
                             bridge->webview->add_NavigationCompleted(
                                 Callback<ICoreWebView2NavigationCompletedEventHandler>(
                                     [bridge](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args) -> HRESULT {
+                                        BOOL isSuccess = FALSE;
+                                        args->get_IsSuccess(&isSuccess);
+                                        COREWEBVIEW2_WEB_ERROR_STATUS status;
+                                        args->get_WebErrorStatus(&status);
+                                        fprintf(stderr, "[WebView2 Bridge] NavigationCompleted: success=%d, error_status=%d\n", isSuccess, (int)status);
+                                        fflush(stderr);
+
                                         if (bridge->nav_completed_cb) {
-                                            BOOL isSuccess = FALSE;
-                                            args->get_IsSuccess(&isSuccess);
                                             const char* err_str = isSuccess ? nullptr : "Navigation failed";
                                             bridge->nav_completed_cb(isSuccess ? 1 : 0, err_str, bridge->nav_completed_user_data);
                                         }
@@ -371,7 +420,8 @@ void webview2_bridge_set_callbacks(WebView2Bridge* bridge,
 }
 
 void webview2_bridge_navigate(WebView2Bridge* bridge, const char* url) {
-    fprintf(stderr, "[WebView2 Bridge] navigate requested: %s\n", url ? url : "(null)");
+    fprintf(stderr, "[WebView2 Bridge] navigate requested: %s (bridge=%p, webview=%p)\n",
+            url ? url : "(null)", bridge, bridge ? bridge->webview.Get() : nullptr);
     fflush(stderr);
     if (bridge && bridge->webview && url) {
         std::wstring wurl = utf8_to_wstring(url);
@@ -460,7 +510,7 @@ void webview2_bridge_resize(WebView2Bridge* bridge, int width, int height) {
 
 void webview2_bridge_set_offset_y(WebView2Bridge* bridge, int offset_y) {
     if (bridge) {
-        bridge->offset_y = offset_y;
+        bridge->offset_y = (offset_y > 0) ? offset_y : 48;
     }
 }
 
