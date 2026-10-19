@@ -1,0 +1,50 @@
+# Archivos innecesarios de la fase REA/inspección
+# Binarios clonados pesados (ya están documentados)
+inspect-safari/*.exe
+inspect-safari/*.dll
+inspect-safari/*.pdb
+inspect-safari/*.pseudocodigo.c
+inspect-safari/pe-inspect.mjs
+inspect-safari/pe-inspect.json
+inspect-safari/ev_*.json
+inspect-safari/*.log
+inspect-safari/ghidra*
+inspect-safari/*analyzer*
+inspect-safari/*report*
+inspect-safari/.rea/
+inspect-safari/.ghidra/
+
+# Solo mantener lo realmente útil
+!inspect-safari/Search.dll
+!inspect-safari/PubSubDLL.dll
+
+# Recursos duplicados / archivos temporales
+habitat-assets/*.orig
+habitat-assets/*.bak
+habitat-assets/*copy*
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+
+# Notas personales / exportaciones
+*.md.bak
+*.txt.bak
+THUMBS.db
+desktop.ini
+.DS_Store
+
+# Archivos de entorno / herramientas
+.env
+.env.local
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Directorios temporales
+__pycache__/
+node_modules/
+.cache/

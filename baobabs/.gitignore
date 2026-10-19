@@ -1,0 +1,64 @@
+# Build directories
+build/
+_build/
+builddir/
+subprojects/*/
+!subprojects/*.wrap
+
+# Meson
+meson-logs/
+meson-private/
+
+# Vala
+*.vala.c
+*.vala.stamp
+*.vapi.stamp
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.la
+*.a
+*.o
+*.lo
+
+# IDE
+.vscode/
+.idea/
+*.user
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Backups
+*.bak
+*.swp
+*.swo
+*~
+
+# Local config
+.env
+.env.local
+
+# WebView2/nuget caches
+packages/
+*.nupkg
+.nuget/
+
+# Test artifacts
+tests/*.log
+tests/*/output/
+
+# Flatpak
+.flatpak-builder/
+
+# Cache
+.cache/

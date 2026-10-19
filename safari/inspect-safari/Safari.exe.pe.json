@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "file": "C:\\Users\\punks\\TGZ\\safari\\inspect-safari\\Safari.exe",
+    "bytes": 2388336,
+    "format": "PE32",
+    "machine": "x86 (i386)",
+    "compile_time_utc": "2012-04-25T16:50:38.000Z",
+    "image_base": "0x400000",
+    "entry_point_rva": "0x1733"
+  },
+  "sections": [
+    {
+      "name": ".text",
+      "vsize": 3156,
+      "vaddr": 4096,
+      "rawsize": 3584,
+      "rawptr": 1024,
+      "chars": 1610612768
+    },
+    {
+      "name": ".rdata",
+      "vsize": 2670,
+      "vaddr": 8192,
+      "rawsize": 3072,
+      "rawptr": 4608,
+      "chars": 1073741888
+    },
+    {
+      "name": ".data",
+      "vsize": 904,
+      "vaddr": 12288,
+      "rawsize": 512,
+      "rawptr": 7680,
+      "chars": 3221225536
+    },
+    {
+      "name": ".rsrc",
+      "vsize": 2370592,
+      "vaddr": 16384,
+      "rawsize": 2371072,
+      "rawptr": 8192,
+      "chars": 1073741888
+    },
+    {
+      "name": ".reloc",
+      "vsize": 3060,
+      "vaddr": 2387968,
+      "rawsize": 3072,
+      "rawptr": 2379264,
+      "chars": 1107296320
+    }
+  ],
+  "imports": [
+    {
+      "dll": "SHLWAPI.dll",
+      "count": 2,
+      "funcs": [
+        "PathAppendW",
+        "PathRemoveFileSpecW"
+      ]
+    },
+    {
+      "dll": "KERNEL32.dll",
+      "count": 20,
+      "funcs": [
+        "GetSystemTimeAsFileTime",
+        "GetCurrentProcessId",
+        "GetCurrentThreadId",
+        "GetModuleHandleW",
+        "GetModuleFileNameW",
+        "GetEnvironmentVariableW",
+        "SetEnvironmentVariableW",
+        "GetProcAddress",
+        "LoadLibraryW",
+        "GetTickCount",
+        "QueryPerformanceCounter",
+        "SetUnhandledExceptionFilter",
+        "UnhandledExceptionFilter",
+        "GetCurrentProcess",
+        "TerminateProcess",
+        "GetStartupInfoW",
+        "InterlockedCompareExchange",
+        "Sleep",
+        "InterlockedExchange",
+        "IsDebuggerPresent"
+      ]
+    },
+    {
+      "dll": "USER32.dll",
+      "count": 1,
+      "funcs": [
+        "MessageBoxW"
+      ]
+    },
+    {
+      "dll": "MSVCR80.dll",
+      "count": 29,
+      "funcs": [
+        "_wcmdln",
+        "_initterm",
+        "_initterm_e",
+        "_configthreadlocale",
+        "exit",
+        "_adjust_fdiv",
+        "__p__commode",
+        "__p__fmode",
+        "_encode_pointer",
+        "__set_app_type",
+        "_crt_debugger_hook",
+        "?terminate@@YAXXZ",
+        "_unlock",
+        "__dllonexit",
+        "_lock",
+        "_onexit",
+        "_decode_pointer",
+        "_except_handler4_common",
+        "_invoke_watson",
+        "_controlfp_s",
+        "_XcptFilter",
+        "_exit",
+        "_cexit",
+        "__wgetmainargs",
+        "_amsg_exit",
+        "_wcsdup",
+        "malloc",
+        "free",
+        "__setusermatherr"
+      ]
+    }
+  ],
+  "exports": {
+    "name": null,
+    "count": 0,
+    "names": []
+  }
+}

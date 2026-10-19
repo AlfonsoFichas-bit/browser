@@ -1,0 +1,124 @@
+{
+  "meta": {
+    "file": "C:\\Users\\punks\\TGZ\\safari\\inspect-safari\\WebKit2WebProcess.exe",
+    "bytes": 14184,
+    "format": "PE32",
+    "machine": "x86 (i386)",
+    "compile_time_utc": "2012-04-25T02:40:45.000Z",
+    "image_base": "0x400000",
+    "entry_point_rva": "0x13bf"
+  },
+  "sections": [
+    {
+      "name": ".text",
+      "vsize": 2276,
+      "vaddr": 4096,
+      "rawsize": 2560,
+      "rawptr": 1024,
+      "chars": 1610612768
+    },
+    {
+      "name": ".rdata",
+      "vsize": 1716,
+      "vaddr": 8192,
+      "rawsize": 2048,
+      "rawptr": 3584,
+      "chars": 1073741888
+    },
+    {
+      "name": ".data",
+      "vsize": 904,
+      "vaddr": 12288,
+      "rawsize": 512,
+      "rawptr": 5632,
+      "chars": 3221225536
+    },
+    {
+      "name": ".rsrc",
+      "vsize": 1396,
+      "vaddr": 16384,
+      "rawsize": 1536,
+      "rawptr": 6144,
+      "chars": 1073741888
+    },
+    {
+      "name": ".reloc",
+      "vsize": 420,
+      "vaddr": 20480,
+      "rawsize": 512,
+      "rawptr": 7680,
+      "chars": 1107296320
+    }
+  ],
+  "imports": [
+    {
+      "dll": "SHLWAPI.dll",
+      "count": 2,
+      "funcs": [
+        "PathAppendW",
+        "PathRemoveFileSpecW"
+      ]
+    },
+    {
+      "dll": "KERNEL32.dll",
+      "count": 18,
+      "funcs": [
+        "GetSystemTimeAsFileTime",
+        "GetCurrentProcessId",
+        "GetCurrentThreadId",
+        "GetModuleFileNameW",
+        "GetProcAddress",
+        "LoadLibraryW",
+        "SetDllDirectoryW",
+        "QueryPerformanceCounter",
+        "IsDebuggerPresent",
+        "SetUnhandledExceptionFilter",
+        "UnhandledExceptionFilter",
+        "GetCurrentProcess",
+        "TerminateProcess",
+        "GetStartupInfoW",
+        "InterlockedCompareExchange",
+        "Sleep",
+        "InterlockedExchange",
+        "GetTickCount"
+      ]
+    },
+    {
+      "dll": "MSVCR80.dll",
+      "count": 26,
+      "funcs": [
+        "_adjust_fdiv",
+        "__p__commode",
+        "__p__fmode",
+        "_encode_pointer",
+        "__setusermatherr",
+        "_crt_debugger_hook",
+        "?terminate@@YAXXZ",
+        "_unlock",
+        "__dllonexit",
+        "_lock",
+        "_onexit",
+        "_decode_pointer",
+        "_except_handler4_common",
+        "_invoke_watson",
+        "_controlfp_s",
+        "_configthreadlocale",
+        "_initterm_e",
+        "_initterm",
+        "_wcmdln",
+        "exit",
+        "_XcptFilter",
+        "_exit",
+        "_cexit",
+        "__wgetmainargs",
+        "_amsg_exit",
+        "__set_app_type"
+      ]
+    }
+  ],
+  "exports": {
+    "name": null,
+    "count": 0,
+    "names": []
+  }
+}

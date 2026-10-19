@@ -1,0 +1,268 @@
+{
+  "meta": {
+    "file": "C:\\Users\\punks\\TGZ\\safari\\inspect-safari\\WebKitQuartzCoreAdditions.dll",
+    "bytes": 159080,
+    "format": "PE32",
+    "machine": "x86 (i386)",
+    "compile_time_utc": "2012-04-25T00:07:35.000Z",
+    "image_base": "0x10000000",
+    "entry_point_rva": "0x1af94"
+  },
+  "sections": [
+    {
+      "name": ".text",
+      "vsize": 108117,
+      "vaddr": 4096,
+      "rawsize": 108544,
+      "rawptr": 1024,
+      "chars": 1610612768
+    },
+    {
+      "name": ".rdata",
+      "vsize": 15401,
+      "vaddr": 114688,
+      "rawsize": 15872,
+      "rawptr": 109568,
+      "chars": 1073741888
+    },
+    {
+      "name": ".data",
+      "vsize": 21776,
+      "vaddr": 131072,
+      "rawsize": 20992,
+      "rawptr": 125440,
+      "chars": 3221225536
+    },
+    {
+      "name": ".rsrc",
+      "vsize": 1152,
+      "vaddr": 155648,
+      "rawsize": 1536,
+      "rawptr": 146432,
+      "chars": 1073741888
+    },
+    {
+      "name": ".reloc",
+      "vsize": 4704,
+      "vaddr": 159744,
+      "rawsize": 5120,
+      "rawptr": 147968,
+      "chars": 1107296320
+    }
+  ],
+  "imports": [
+    {
+      "dll": "CoreFoundation.dll",
+      "count": 7,
+      "funcs": [
+        "CFGetAllocator",
+        "CFRelease",
+        "__CFStringMakeConstantString",
+        "CFStringCreateWithFormat",
+        "CFRetain",
+        "_CFRuntimeRegisterClass",
+        "_CFRuntimeCreateInstance"
+      ]
+    },
+    {
+      "dll": "CoreGraphics.dll",
+      "count": 12,
+      "funcs": [
+        "CGSReleaseRegion",
+        "CGRectGetHeight",
+        "CGRectGetWidth",
+        "CGSGetRegionBounds",
+        "CGRectGetMaxY",
+        "CGRectGetMinX",
+        "CGRectEqualToRect",
+        "CGPointZero",
+        "CGRectIntersection",
+        "CGRectNull",
+        "CGRectIsEmpty",
+        "CGRectZero"
+      ]
+    },
+    {
+      "dll": "QuartzCore.dll",
+      "count": 26,
+      "funcs": [
+        "CACurrentMediaTime",
+        "CACFContextGetRenderContext",
+        "CARenderContextLock",
+        "CARenderUpdateAddContext",
+        "CARenderContextUnlock",
+        "CACFContextCreate",
+        "CARenderNotificationAddObserver",
+        "CARenderNotificationRemoveObserver",
+        "CACFLayerSetFrame",
+        "CACFContextSetLayer",
+        "CARenderContextInvalidateRect",
+        "kCARenderSoftwareCallbacks",
+        "CARenderSoftwareSetDestination",
+        "CARenderUpdateAddRect",
+        "CACFContextGetLastCommitTime",
+        "CACFContextFlush",
+        "CACFContextSetUserData",
+        "CARenderUpdateGetNextTime",
+        "CARenderOGLRender",
+        "CARenderUpdateFinish",
+        "CARenderOGLNew",
+        "CARenderUpdateBegin",
+        "CARenderOGLPurge",
+        "CARenderUpdateCopyRegion",
+        "kCARenderDX9Callbacks",
+        "CARenderOGLDestroy"
+      ]
+    },
+    {
+      "dll": "JavaScriptCore.dll",
+      "count": 12,
+      "funcs": [
+        "??0Mutex@WTF@@QAE@XZ",
+        "??1Mutex@WTF@@QAE@XZ",
+        "?lock@Mutex@WTF@@QAEXXZ",
+        "?unlock@Mutex@WTF@@QAEXXZ",
+        "?fastZeroedMalloc@WTF@@YAPAXI@Z",
+        "?deleteOwnedPtr@WTF@@YAXPAUHDC__@@@Z",
+        "?deleteOwnedPtr@WTF@@YAXPAUHBITMAP__@@@Z",
+        "WTFReportBacktrace",
+        "?createThread@WTF@@YAIP6APAXPAX@Z0PBD@Z",
+        "?waitForThreadCompletion@WTF@@YAHIPAPAX@Z",
+        "?fastFree@WTF@@YAXPAX@Z",
+        "?fastMalloc@WTF@@YAPAXI@Z"
+      ]
+    },
+    {
+      "dll": "USER32.dll",
+      "count": 6,
+      "funcs": [
+        "DestroyWindow",
+        "CreateWindowExW",
+        "KillTimer",
+        "RegisterClassW",
+        "DefWindowProcW",
+        "SetTimer"
+      ]
+    },
+    {
+      "dll": "d3d9.dll",
+      "count": 1,
+      "funcs": [
+        "Direct3DCreate9"
+      ]
+    },
+    {
+      "dll": "KERNEL32.dll",
+      "count": 26,
+      "funcs": [
+        "OutputDebugStringA",
+        "InterlockedExchange",
+        "InterlockedCompareExchange",
+        "TerminateProcess",
+        "UnhandledExceptionFilter",
+        "SetUnhandledExceptionFilter",
+        "IsDebuggerPresent",
+        "QueryPerformanceCounter",
+        "GetTickCount",
+        "GetCurrentThreadId",
+        "GetCurrentProcessId",
+        "GetSystemTimeAsFileTime",
+        "Sleep",
+        "IsProcessorFeaturePresent",
+        "CreateFileMappingW",
+        "GetCurrentProcess",
+        "DuplicateHandle",
+        "CloseHandle",
+        "CreateEventW",
+        "WaitForSingleObject",
+        "GetCurrentThread",
+        "LoadLibraryW",
+        "InterlockedIncrement",
+        "InterlockedDecrement",
+        "SetEvent",
+        "SetThreadPriority"
+      ]
+    },
+    {
+      "dll": "GDI32.dll",
+      "count": 5,
+      "funcs": [
+        "SelectObject",
+        "CreateDIBSection",
+        "CreateCompatibleDC",
+        "BitBlt",
+        "GetObjectW"
+      ]
+    },
+    {
+      "dll": "ADVAPI32.dll",
+      "count": 3,
+      "funcs": [
+        "RegQueryValueExA",
+        "RegOpenKeyA",
+        "RegCloseKey"
+      ]
+    },
+    {
+      "dll": "MSVCP80.dll",
+      "count": 1,
+      "funcs": [
+        "_Inf"
+      ]
+    },
+    {
+      "dll": "MSVCR80.dll",
+      "count": 23,
+      "funcs": [
+        "_lock",
+        "__dllonexit",
+        "_unlock",
+        "__clean_type_info_names_internal",
+        "_crt_debugger_hook",
+        "__CppXcptFilter",
+        "_adjust_fdiv",
+        "_amsg_exit",
+        "_initterm_e",
+        "_onexit",
+        "_decode_pointer",
+        "_encoded_null",
+        "free",
+        "_malloc_crt",
+        "_encode_pointer",
+        "memset",
+        "_finite",
+        "_CIacos",
+        "_purecall",
+        "_except_handler4_common",
+        "memcpy",
+        "_initterm",
+        "__CxxFrameHandler"
+      ]
+    }
+  ],
+  "exports": {
+    "name": "WebKitQuartzCoreAdditions.dll",
+    "count": 19,
+    "names": [
+      "WKCACFImageCopyFileMapping",
+      "WKCACFImageGetHeight",
+      "WKCACFImageGetTypeID",
+      "WKCACFImageGetWidth",
+      "WKCACFShutDown",
+      "WKCACFViewCanDraw",
+      "WKCACFViewCopyDrawnImage",
+      "WKCACFViewCreate",
+      "WKCACFViewDraw",
+      "WKCACFViewDrawIntoDC",
+      "WKCACFViewFlushContext",
+      "WKCACFViewGetContext",
+      "WKCACFViewGetLastCommitTime",
+      "WKCACFViewGetTypeID",
+      "WKCACFViewInvalidateRects",
+      "WKCACFViewSetContextDidChangeCallback",
+      "WKCACFViewSetContextUserData",
+      "WKCACFViewSetLayer",
+      "WKCACFViewUpdate"
+    ]
+  }
+}
