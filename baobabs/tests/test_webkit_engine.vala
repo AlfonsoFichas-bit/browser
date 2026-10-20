@@ -8,7 +8,7 @@ public class TestWebKitEngine : GLib.Object {
 
         var window = new Gtk.Window();
         var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-        var widget = new Gtk.DrawingArea();
+        var widget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
         box.append(widget);
         window.set_child(box);
 
@@ -52,7 +52,7 @@ public class TestWebKitEngine : GLib.Object {
         var engine = new Baobabs.WebKitEngine();
         var window = new Gtk.Window();
         var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-        var widget = new Gtk.DrawingArea();
+        var widget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
         box.append(widget);
         window.set_child(box);
         engine.attach(widget, null);
@@ -84,7 +84,7 @@ public class TestWebKitEngine : GLib.Object {
         var engine = new Baobabs.WebKitEngine();
         var window = new Gtk.Window();
         var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-        var widget = new Gtk.DrawingArea();
+        var widget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
         box.append(widget);
         window.set_child(box);
         engine.attach(widget, null);
@@ -117,7 +117,7 @@ public class TestWebKitEngine : GLib.Object {
         var engine = new Baobabs.WebKitEngine();
         var window = new Gtk.Window();
         var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
-        var widget = new Gtk.DrawingArea();
+        var widget = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
         box.append(widget);
         window.set_child(box);
         engine.attach(widget, null);

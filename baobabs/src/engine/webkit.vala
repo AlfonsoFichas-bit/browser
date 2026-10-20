@@ -218,18 +218,12 @@ namespace Baobabs {
                 update_navigation_actions();
             });
 
-            // Option A with fallback to Option B
-            var parent = host.get_parent();
-            if (parent != null && parent is Gtk.Box) {
-                var box = (Gtk.Box)parent;
-                box.remove(host);
-                box.append(web_view);
+            if (host is Gtk.Overlay) {
+                ((Gtk.Overlay)host).add_overlay(web_view);
             } else if (host is Gtk.Box) {
-                var box = (Gtk.Box)host;
-                box.append(web_view);
-            } else if (parent != null && parent is Gtk.Widget) {
-                // Not sure if parent implements something like container or other api,
-                // fall back logic safely. If nothing works, just hold reference to web_view.
+                ((Gtk.Box)host).append(web_view);
+            } else {
+                GLib.warning("WebKitEngine.attach: host no es contenedor (Overlay/Box); el web_view no se montará.");
             }
         }
 

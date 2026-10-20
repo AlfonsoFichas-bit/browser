@@ -1,7 +1,7 @@
 using Gtk;
 
 namespace Baobabs {
-    public class SizeTrackingArea : DrawingArea {
+    public class SizeTrackingArea : Gtk.Box {
         public signal void size_changed(int width, int height);
 
         public override void size_allocate(int width, int height, int baseline) {
@@ -82,11 +82,6 @@ namespace Baobabs {
             web_area = new SizeTrackingArea();
             web_area.hexpand = true;
             web_area.vexpand = true;
-
-            // Función de dibujado vacía para evitar que GTK pinte fondos opacos sobre WebView2
-            web_area.set_draw_func((area, cr, width, height) => {
-                // No dibujar nada
-            });
 
             var box = new Box(Orientation.VERTICAL, 0);
             box.append(web_area);
