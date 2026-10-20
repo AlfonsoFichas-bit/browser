@@ -41,6 +41,18 @@ else
   baobabs_core_sources += files('engine/webkit.vala')
 endif
 
+# Compilar el recurso (en data/, donde ya vive Reader.html)
+gnome = import('gnome')
+res = gnome.compile_resources(
+  'baobabs-resources',
+  '../data/style.gresource.xml',
+  source_dir: '../data',
+  c_name: 'baobabs_res',
+)
+
+# 1) El recurso en SU PROPIA static_library
+res_lib = static_library('baobabs-resources-lib', res, dependencies: baobabs_deps)
+
 # Libreria estatica: la enlazan el ejecutable y los tests
 baobabs_core = static_library('baobabs-core',
   baobabs_core_sources,
@@ -50,6 +62,7 @@ baobabs_core = static_library('baobabs-core',
 
 # Expone libreria + vapi + header generado a los consumidores
 baobabs_core_dep = declare_dependency(
+  link_whole: res_lib,
   link_with: baobabs_core,
   dependencies: baobabs_deps,
   include_directories: extra_includes,

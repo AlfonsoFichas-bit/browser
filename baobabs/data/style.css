@@ -1,0 +1,77 @@
+/* style.css - Safari 5.1 Light Theme Inspiration */
+
+window {
+    background-color: #ececec;
+}
+
+/* HeaderBar styling */
+.safari-headerbar {
+    background: #e8e8e8;
+    border-bottom: 1px solid #d0d0d0;
+    box-shadow: none;
+    padding: 6px;
+}
+
+/* HeaderBar Buttons */
+.safari-headerbar button {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: #333333;
+}
+
+.safari-headerbar button:hover {
+    background-color: #d8d8d8;
+}
+
+.safari-headerbar button:active,
+.safari-headerbar button:checked {
+    background-color: #cccccc;
+    color: rgb(32, 0, 127); /* Apple highlight blue */
+}
+
+/* URL Entry */
+.safari-url-entry {
+    background-color: #ffffff;
+    border: 1px solid #c0c0c0;
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: #000000;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.safari-url-entry:focus {
+    border-color: rgb(32, 0, 127);
+    box-shadow: inset 0 1px 2px rgba(32, 0, 127, 0.2);
+}
+
+/* Favorites Bar */
+.favorites-bar {
+    background-color: #e8e8e8;
+    border-bottom: 1px solid #d0d0d0;
+    padding: 2px 4px;
+    min-height: 24px;
+}
+
+/* Favorites Items (Leaves and Folders) */
+.favorites-item {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: #333333;
+    font-size: 13px;
+}
+
+.favorites-item:hover {
+    background-color: #d8d8d8;
+}
+
+.favorites-item:active,
+.favorites-item:checked {
+    background-color: #cccccc;
+    color: rgb(32, 0, 127);
+}

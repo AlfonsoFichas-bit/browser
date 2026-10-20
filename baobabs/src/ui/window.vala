@@ -40,6 +40,7 @@ namespace Baobabs {
 
             var header = new HeaderBar();
             header.show_title_buttons = true;
+            header.add_css_class("safari-headerbar");
             set_titlebar(header);
 
             // Botón Atrás
@@ -77,6 +78,7 @@ namespace Baobabs {
             url_entry.hexpand = true;
             url_entry.placeholder_text = "Buscar o introducir dirección web";
             url_entry.text = this.default_url;
+            url_entry.add_css_class("safari-url-entry");
             url_entry.activate.connect(on_url_activated);
             header.set_title_widget(url_entry);
 
