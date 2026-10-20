@@ -31,7 +31,19 @@ public class TestWebKitEngine : GLib.Object {
         assert(engine.url != null);
         assert(engine.title != null);
 
+        // Run the loop to process dbus messages or internal states that flush settings
+        var loop = new GLib.MainLoop();
+        GLib.Timeout.add(50, () => {
+            loop.quit();
+            return false;
+        });
+        loop.run();
+
+        // Assert cookies file was created since the profile dir is persistent
+        assert(GLib.FileUtils.test(GLib.Path.build_filename(test_dir, "webkit", "cookies.sqlite"), GLib.FileTest.EXISTS));
+
         GLib.FileUtils.remove(GLib.Path.build_filename(test_dir, "webkit", "cache"));
+        GLib.FileUtils.remove(GLib.Path.build_filename(test_dir, "webkit", "cookies.sqlite"));
         GLib.FileUtils.remove(GLib.Path.build_filename(test_dir, "webkit"));
         GLib.FileUtils.remove(test_dir);
     }

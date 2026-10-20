@@ -128,6 +128,11 @@ namespace Baobabs {
                 GLib.DirUtils.create_with_parents(cache_dir, 0700);
 
                 session = new WebKit.NetworkSession(data_dir, cache_dir);
+
+                // Persistir cookies en disco (sin esto se pierden al cerrar)
+                string cookie_file = GLib.Path.build_filename(data_dir, "cookies.sqlite");
+                session.get_cookie_manager().set_persistent_storage(
+                    cookie_file, WebKit.CookiePersistentStorage.SQLITE);
             } else {
                 session = new WebKit.NetworkSession.ephemeral();
             }
