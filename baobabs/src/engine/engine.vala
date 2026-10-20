@@ -30,5 +30,7 @@ namespace Baobabs {
         public abstract void execute_script(string js);
         public abstract void set_user_agent(string ua);
         public abstract void focus();
+
+        public abstract void set_bounds(int x, int y, int width, int height, int win_w, int win_h);
     }
 }

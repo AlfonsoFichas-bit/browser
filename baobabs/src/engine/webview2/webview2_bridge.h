@@ -74,8 +74,7 @@ double webview2_bridge_get_zoom(WebView2Bridge* bridge);
 void webview2_bridge_focus(WebView2Bridge* bridge);
 
 // Dimensiones y posición
-void webview2_bridge_resize(WebView2Bridge* bridge, int width, int height);
-void webview2_bridge_set_offset_y(WebView2Bridge* bridge, int offset_y);
+void webview2_bridge_set_bounds(WebView2Bridge* bridge, int x, int y, int width, int height, int win_w, int win_h);
 
 // Helper para obtener el HWND de Windows desde un widget GTK4
 void* webview2_get_widget_hwnd(void* gtk_widget);

@@ -108,15 +108,9 @@ namespace Baobabs {
             });
         }
 
-        public void resize(int width, int height) {
+        public void set_bounds(int x, int y, int width, int height, int win_w, int win_h) {
             if (bridge != null) {
-                bridge.resize(width, height);
-            }
-        }
-
-        public void set_offset_y(int offset_y) {
-            if (bridge != null) {
-                bridge.set_offset_y(offset_y);
+                bridge.set_bounds(x, y, width, height, win_w, win_h);
             }
         }
 

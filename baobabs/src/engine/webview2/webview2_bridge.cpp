@@ -35,7 +35,12 @@ struct WebView2Bridge {
     ComPtr<ICoreWebView2Controller> webviewController;
     ComPtr<ICoreWebView2> webview;
     HWND hwnd;
-    int offset_y;
+    int logical_x;
+    int logical_y;
+    int logical_w;
+    int logical_h;
+    int logical_win_w;
+    int logical_win_h;
 
     WebView2URLChangedCallback url_cb;
     void* url_user_data;
@@ -67,7 +72,12 @@ struct WebView2Bridge {
 
     WebView2Bridge()
         : hwnd(nullptr),
-          offset_y(48),
+          logical_x(0),
+          logical_y(48),
+          logical_w(0),
+          logical_h(0),
+          logical_win_w(0),
+          logical_win_h(0),
           url_cb(nullptr),
           url_user_data(nullptr),
           url_destroy(nullptr),
@@ -88,7 +98,7 @@ struct WebView2Bridge {
           history_changed_destroy(nullptr),
           com_initialized(false) {}
 
-    void UpdateBounds(int logical_w, int logical_h) {
+    void UpdateBounds() {
         if (webviewController && hwnd) {
             RECT clientRect;
             GetClientRect(hwnd, &clientRect);
@@ -96,26 +106,37 @@ struct WebView2Bridge {
             int phys_width = clientRect.right - clientRect.left;
             int phys_height = clientRect.bottom - clientRect.top;
 
-            int phys_offset_y = offset_y;
-            if (logical_h > 0 && phys_height > 0 && logical_h != phys_height) {
-                double scale = static_cast<double>(phys_height) / static_cast<double>(logical_h);
-                phys_offset_y = static_cast<int>(offset_y * scale);
+            double scale_x = 1.0;
+            double scale_y = 1.0;
+
+            if (logical_win_w > 0 && phys_width > 0) {
+                scale_x = static_cast<double>(phys_width) / static_cast<double>(logical_win_w);
+            }
+            if (logical_win_h > 0 && phys_height > 0) {
+                scale_y = static_cast<double>(phys_height) / static_cast<double>(logical_win_h);
             }
 
-            // Fallback razonable si la ventana aún no tiene dimensiones finales
-            if (phys_width <= 0) phys_width = 1100;
-            if (phys_height <= phys_offset_y) phys_height = 750;
-
             RECT bounds;
-            bounds.left = 0;
-            bounds.top = phys_offset_y;
-            bounds.right = phys_width;
-            bounds.bottom = phys_height;
+            if (logical_w > 0 && logical_h > 0) {
+                bounds.left = static_cast<int>(logical_x * scale_x);
+                bounds.top = static_cast<int>(logical_y * scale_y);
+                bounds.right = bounds.left + static_cast<int>(logical_w * scale_x);
+                bounds.bottom = bounds.top + static_cast<int>(logical_h * scale_y);
+            } else {
+                // Fallback si no hay dimensiones lógicas válidas
+                bounds.left = 0;
+                bounds.top = static_cast<int>(logical_y * scale_y);
+                if (phys_width <= 0) phys_width = 1100;
+                if (phys_height <= bounds.top) phys_height = 750;
+                bounds.right = phys_width;
+                bounds.bottom = phys_height;
+            }
 
             HRESULT hr = webviewController->put_Bounds(bounds);
             webviewController->put_IsVisible(TRUE);
 
-            fprintf(stderr, "[WebView2 Bridge] UpdateBounds: left=%ld top=%ld right=%ld bottom=%ld (put_Bounds: 0x%08lX)\n",
+            fprintf(stderr, "[WebView2 Bridge] UpdateBounds (logical rect: %d,%d %dx%d, win: %dx%d): left=%ld top=%ld right=%ld bottom=%ld (put_Bounds: 0x%08lX)\n",
+                    logical_x, logical_y, logical_w, logical_h, logical_win_w, logical_win_h,
                     bounds.left, bounds.top, bounds.right, bounds.bottom, (unsigned long)hr);
             fflush(stderr);
 
@@ -165,7 +186,7 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
         return;
     }
     bridge->hwnd = static_cast<HWND>(hwnd_ptr);
-    bridge->offset_y = (offset_y > 0) ? offset_y : 48;
+    bridge->logical_y = (offset_y > 0) ? offset_y : 48;
     if (bridge->ready_destroy) {
         bridge->ready_destroy(bridge->ready_user_data);
     }
@@ -173,8 +194,8 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
     bridge->ready_user_data = user_data;
     bridge->ready_destroy = destroy;
 
-    fprintf(stderr, "[WebView2 Bridge] initialize called with HWND=%p, offset_y=%d, profile=%s\n",
-            bridge->hwnd, offset_y, user_data_dir ? user_data_dir : "(default)");
+    fprintf(stderr, "[WebView2 Bridge] initialize called with HWND=%p, logical_y=%d, profile=%s\n",
+            bridge->hwnd, bridge->logical_y, user_data_dir ? user_data_dir : "(default)");
     fflush(stderr);
 
     // Activar WS_CLIPCHILDREN en la ventana padre de GTK para evitar que el repintado
@@ -338,7 +359,7 @@ void webview2_bridge_initialize(WebView2Bridge* bridge,
                                     }).Get(), &bridge->newWindowRequestedToken);
 
                             // Bounds iniciales adaptados al tamaño de la ventana
-                            bridge->UpdateBounds(0, 0);
+                            bridge->UpdateBounds();
 
                             // Visibilidad
                             controller->put_IsVisible(TRUE);
@@ -554,15 +575,15 @@ void webview2_bridge_focus(WebView2Bridge* bridge) {
     }
 }
 
-void webview2_bridge_resize(WebView2Bridge* bridge, int width, int height) {
+void webview2_bridge_set_bounds(WebView2Bridge* bridge, int x, int y, int width, int height, int win_w, int win_h) {
     if (bridge) {
-        bridge->UpdateBounds(width, height);
-    }
-}
-
-void webview2_bridge_set_offset_y(WebView2Bridge* bridge, int offset_y) {
-    if (bridge) {
-        bridge->offset_y = (offset_y > 0) ? offset_y : 48;
+        bridge->logical_x = x;
+        bridge->logical_y = y;
+        bridge->logical_w = width;
+        bridge->logical_h = height;
+        bridge->logical_win_w = win_w;
+        bridge->logical_win_h = win_h;
+        bridge->UpdateBounds();
     }
 }
 

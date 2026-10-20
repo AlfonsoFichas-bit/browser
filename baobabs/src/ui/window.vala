@@ -124,24 +124,27 @@ namespace Baobabs {
         private void update_webview_size() {
             int win_w = this.get_width();
             int win_h = this.get_height();
-            int area_h = web_area.get_height();
-            int offset_y = (win_h > area_h && area_h > 0) ? (win_h - area_h) : 48;
-            engine.set_offset_y(offset_y);
-            engine.resize(win_w, win_h);
+
+            Graphene.Rect rect;
+            if (web_area.compute_bounds(this, out rect)) {
+                engine.set_bounds((int)rect.origin.x, (int)rect.origin.y, (int)rect.size.width, (int)rect.size.height, win_w, win_h);
+            }
         }
 
         public void start() {
             void* hwnd = WebView2.get_widget_hwnd(this);
             stderr.printf("[MainWindow] start() called. Window HWND: %p\n", hwnd);
             if (hwnd != null) {
-                int win_h = this.get_height();
-                int area_h = web_area.get_height();
-                int offset_y = (win_h > area_h && area_h > 0) ? (win_h - area_h) : 48;
+                Graphene.Rect rect;
+                int logical_y = 48;
+                if (web_area.compute_bounds(this, out rect)) {
+                    logical_y = (int)rect.origin.y;
+                }
                 string profile = Config.get_instance().profile_dir;
 
-                stderr.printf("[MainWindow] Initializing engine with HWND=%p, offset_y=%d, profile=%s\n",
-                              hwnd, offset_y, profile);
-                engine.initialize(hwnd, offset_y, profile);
+                stderr.printf("[MainWindow] Initializing engine with HWND=%p, logical_y=%d, profile=%s\n",
+                              hwnd, logical_y, profile);
+                engine.initialize(hwnd, logical_y, profile);
                 engine.load_uri(this.default_url);
 
                 // Ajustar tamaños de forma garantizada tras la renderización inicial del layout GTK

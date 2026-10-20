@@ -83,10 +83,7 @@ namespace WebView2 {
         [CCode (cname = "webview2_bridge_focus", instance_pos = 0.1)]
         public void focus ();
 
-        [CCode (cname = "webview2_bridge_resize", instance_pos = 0.1)]
-        public void resize (int width, int height);
-
-        [CCode (cname = "webview2_bridge_set_offset_y", instance_pos = 0.1)]
-        public void set_offset_y (int offset_y);
+        [CCode (cname = "webview2_bridge_set_bounds", instance_pos = 0.1)]
+        public void set_bounds (int x, int y, int width, int height, int win_w, int win_h);
     }
 }
