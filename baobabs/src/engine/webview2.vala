@@ -129,8 +129,12 @@ namespace Baobabs {
                 stderr.printf("[WebView2Engine] WARNING: Host widget is not attached to a window yet.\n");
             }
 
-            target_host.notify["width"].connect((obj, pspec) => update_bounds());
-            target_host.notify["height"].connect((obj, pspec) => update_bounds());
+            var tracker = target_host as SizeTrackingArea;
+            if (tracker != null) {
+                tracker.size_changed.connect((w, h) => update_bounds());
+            } else {
+                stderr.printf("[WebView2Engine] WARNING: target_host is not a SizeTrackingArea, resize tracking disabled.\n");
+            }
         }
 
         public void start() {

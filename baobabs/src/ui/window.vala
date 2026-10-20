@@ -1,13 +1,22 @@
 using Gtk;
 
 namespace Baobabs {
+    public class SizeTrackingArea : DrawingArea {
+        public signal void size_changed(int width, int height);
+
+        public override void size_allocate(int width, int height, int baseline) {
+            base.size_allocate(width, height, baseline);
+            size_changed(width, height);
+        }
+    }
+
     public class MainWindow : ApplicationWindow {
         private BrowserEngine engine;
         private Entry url_entry;
         private Button back_btn;
         private Button forward_btn;
         private Button reload_btn;
-        private DrawingArea web_area;
+        private SizeTrackingArea web_area;
         private bool is_loading = false;
         private string default_url = "https://duckduckgo.com";
 
@@ -70,7 +79,7 @@ namespace Baobabs {
             header.set_title_widget(url_entry);
 
             // Área de visualización web
-            web_area = new DrawingArea();
+            web_area = new SizeTrackingArea();
             web_area.hexpand = true;
             web_area.vexpand = true;
 
