@@ -1,0 +1,37 @@
+name: baobabs
+version: '0.1.0'
+summary: Navegador web minimalista
+description: |
+  Baobabs es un navegador web minimalista inspirado en Safari 5.1.7,
+  construido con GTK4 y WebKitGTK para Linux.
+base: core24
+confinement: strict
+
+apps:
+  baobabs:
+    command: usr/local/bin/baobabs
+    extensions: [gnome]
+    plugs:
+      - network
+      - network-bind
+      - audio-playback
+      - opengl
+      - wayland
+      - x11
+      - desktop
+      - desktop-legacy
+      - home
+      - browser-support
+      - gsettings
+
+parts:
+  baobabs:
+    plugin: meson
+    source: ../../
+    build-packages:
+      - libgtk-4-dev
+      - libwebkitgtk-6.0-dev
+      - valac
+      - libgee-0.8-dev
+    stage-packages:
+      - libgee-0.8-2

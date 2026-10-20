@@ -56,6 +56,15 @@ sudo dpkg -i packaging/deb/baobabs_0.1.0_amd64.deb
 sudo apt-get install -f
 ```
 
+### Método 3: Paquete Snap
+Baobabs cuenta también con soporte para ser empaquetado y distribuido como formato de aplicación Snap en distribuciones que lo soporten haciendo uso del entorno base de GNOME que provee sus códecs integrados.
+
+```bash
+cd packaging/snap
+snapcraft
+sudo snap install baobabs_0.1.0_amd64.snap --dangerous
+```
+
 ## Licencia
 
 Por determinar. Base de estudio: Safari 5.1.7 (Windows) — análisis estático únicamente.
