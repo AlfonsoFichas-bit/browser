@@ -106,30 +106,30 @@ struct WebView2Bridge {
             int phys_width = clientRect.right - clientRect.left;
             int phys_height = clientRect.bottom - clientRect.top;
 
-            double scale_x = 1.0;
-            double scale_y = 1.0;
+            int margin_x = 0;
+            int margin_y = 0;
 
-            if (logical_win_w > 0 && phys_width > 0) {
-                scale_x = static_cast<double>(phys_width) / static_cast<double>(logical_win_w);
+            if (logical_win_w > 0 && phys_width > logical_win_w) {
+                margin_x = (phys_width - logical_win_w) / 2;
             }
-            if (logical_win_h > 0 && phys_height > 0) {
-                scale_y = static_cast<double>(phys_height) / static_cast<double>(logical_win_h);
+            if (logical_win_h > 0 && phys_height > logical_win_h) {
+                margin_y = (phys_height - logical_win_h) / 2;
             }
 
             RECT bounds;
             if (logical_w > 0 && logical_h > 0) {
-                bounds.left = static_cast<int>(logical_x * scale_x);
-                bounds.top = static_cast<int>(logical_y * scale_y);
-                bounds.right = bounds.left + static_cast<int>(logical_w * scale_x);
-                bounds.bottom = bounds.top + static_cast<int>(logical_h * scale_y);
+                bounds.left = logical_x + margin_x;
+                bounds.top = logical_y + margin_y;
+                bounds.right = bounds.left + logical_w;
+                bounds.bottom = bounds.top + logical_h;
             } else {
                 // Fallback si no hay dimensiones lógicas válidas
-                bounds.left = 0;
-                bounds.top = static_cast<int>(logical_y * scale_y);
+                bounds.left = margin_x;
+                bounds.top = logical_y + margin_y;
                 if (phys_width <= 0) phys_width = 1100;
                 if (phys_height <= bounds.top) phys_height = 750;
-                bounds.right = phys_width;
-                bounds.bottom = phys_height;
+                bounds.right = phys_width - margin_x;
+                bounds.bottom = phys_height - margin_y;
             }
 
             HRESULT hr = webviewController->put_Bounds(bounds);
