@@ -164,7 +164,8 @@ namespace Baobabs {
                 surface.layout.connect((w, h) => update_bounds());
             } else {
                 // Fallback: si aún no está mapeada, intentamos conectarlo cuando se mapee
-                toplevel.realize.connect((w) => {
+                Gtk.Widget w_toplevel = toplevel;
+                w_toplevel.realize.connect(() => {
                     var s = toplevel.get_surface();
                     if (s != null) s.layout.connect((sw, sh) => update_bounds());
                 });
