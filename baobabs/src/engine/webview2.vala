@@ -51,6 +51,10 @@ namespace Baobabs {
 
         private string? pending_uri = null;
 
+        private Gtk.Widget? host;
+        private string? profile_dir;
+        private void* hwnd;
+
         public WebView2Engine() {
             Object();
             bridge = new WebView2.Bridge();
@@ -94,9 +98,9 @@ namespace Baobabs {
             });
         }
 
-        public void initialize(void* hwnd, int offset_y, string? profile_dir = null) {
+        private void initialize(void* h, int offset_y, string? p_dir) {
             if (bridge == null) return;
-            bridge.initialize(hwnd, offset_y, profile_dir, () => {
+            bridge.initialize(h, offset_y, p_dir, () => {
                 _is_ready = true;
                 if (pending_uri != null) {
                     string target = pending_uri;
@@ -108,9 +112,81 @@ namespace Baobabs {
             });
         }
 
-        public void set_bounds(int x, int y, int width, int height, int win_w, int win_h) {
+        private void set_bounds(int x, int y, int width, int height, int win_w, int win_h) {
             if (bridge != null) {
                 bridge.set_bounds(x, y, width, height, win_w, win_h);
+            }
+        }
+
+        public void attach(Gtk.Widget target_host, string? p_dir = null) {
+            this.host = target_host;
+            this.profile_dir = p_dir;
+
+            var toplevel = target_host.get_native() as Gtk.Window;
+            if (toplevel != null) {
+                this.hwnd = WebView2.get_widget_hwnd(toplevel);
+            } else {
+                stderr.printf("[WebView2Engine] WARNING: Host widget is not attached to a window yet.\n");
+            }
+
+            target_host.resize.connect((w, h) => {
+                update_bounds();
+            });
+        }
+
+        public void start() {
+            if (this.host == null) {
+                stderr.printf("[WebView2Engine] ERROR: start() called before attach()\n");
+                return;
+            }
+
+            var toplevel = this.host.get_native() as Gtk.Window;
+            if (toplevel == null) return;
+
+            if (this.hwnd == null) {
+                this.hwnd = WebView2.get_widget_hwnd(toplevel);
+            }
+
+            if (this.hwnd != null) {
+                Graphene.Rect rect;
+                int logical_y = 48;
+                if (this.host.compute_bounds(toplevel, out rect)) {
+                    logical_y = (int)rect.origin.y;
+                }
+
+                stderr.printf("[WebView2Engine] Initializing bridge with HWND=%p, logical_y=%d, profile=%s\n",
+                              this.hwnd, logical_y, this.profile_dir != null ? this.profile_dir : "(null)");
+                this.initialize(this.hwnd, logical_y, this.profile_dir);
+
+                // Ajustar tamaños de forma garantizada tras la renderización inicial del layout GTK
+                GLib.Timeout.add(200, () => {
+                    update_bounds();
+                    return false;
+                });
+                GLib.Timeout.add(600, () => {
+                    update_bounds();
+                    return false;
+                });
+                GLib.Timeout.add(1200, () => {
+                    update_bounds();
+                    return false;
+                });
+            } else {
+                stderr.printf("[WebView2Engine] ERROR: Failed to retrieve HWND!\n");
+            }
+        }
+
+        private void update_bounds() {
+            if (this.host == null) return;
+            var toplevel = this.host.get_native() as Gtk.Window;
+            if (toplevel == null) return;
+
+            int win_w = toplevel.get_width();
+            int win_h = toplevel.get_height();
+
+            Graphene.Rect rect;
+            if (this.host.compute_bounds(toplevel, out rect)) {
+                this.set_bounds((int)rect.origin.x, (int)rect.origin.y, (int)rect.size.width, (int)rect.size.height, win_w, win_h);
             }
         }
 

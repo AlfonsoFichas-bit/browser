@@ -2,7 +2,7 @@ using Gtk;
 
 namespace Baobabs {
     public class MainWindow : ApplicationWindow {
-        private WebView2Engine engine;
+        private BrowserEngine engine;
         private Entry url_entry;
         private Button back_btn;
         private Button forward_btn;
@@ -25,7 +25,7 @@ namespace Baobabs {
         }
 
         construct {
-            engine = new WebView2Engine();
+            engine = create_engine();
 
             var header = new HeaderBar();
             header.show_title_buttons = true;
@@ -115,54 +115,12 @@ namespace Baobabs {
                 forward_btn.sensitive = engine.can_go_forward;
             });
 
-            // Redimensionamiento del WebView2 coordinado con el widget GTK
-            web_area.resize.connect((w, h) => {
-                update_webview_size();
-            });
-        }
-
-        private void update_webview_size() {
-            int win_w = this.get_width();
-            int win_h = this.get_height();
-
-            Graphene.Rect rect;
-            if (web_area.compute_bounds(this, out rect)) {
-                engine.set_bounds((int)rect.origin.x, (int)rect.origin.y, (int)rect.size.width, (int)rect.size.height, win_w, win_h);
-            }
         }
 
         public void start() {
-            void* hwnd = WebView2.get_widget_hwnd(this);
-            stderr.printf("[MainWindow] start() called. Window HWND: %p\n", hwnd);
-            if (hwnd != null) {
-                Graphene.Rect rect;
-                int logical_y = 48;
-                if (web_area.compute_bounds(this, out rect)) {
-                    logical_y = (int)rect.origin.y;
-                }
-                string profile = Config.get_instance().profile_dir;
-
-                stderr.printf("[MainWindow] Initializing engine with HWND=%p, logical_y=%d, profile=%s\n",
-                              hwnd, logical_y, profile);
-                engine.initialize(hwnd, logical_y, profile);
-                engine.load_uri(this.default_url);
-
-                // Ajustar tamaños de forma garantizada tras la renderización inicial del layout GTK
-                GLib.Timeout.add(200, () => {
-                    update_webview_size();
-                    return false;
-                });
-                GLib.Timeout.add(600, () => {
-                    update_webview_size();
-                    return false;
-                });
-                GLib.Timeout.add(1200, () => {
-                    update_webview_size();
-                    return false;
-                });
-            } else {
-                stderr.printf("[MainWindow] ERROR: Failed to retrieve HWND for MainWindow!\n");
-            }
+            engine.attach(web_area, Config.get_instance().profile_dir);
+            engine.start();
+            engine.load_uri(this.default_url);
         }
 
         private void on_url_activated() {

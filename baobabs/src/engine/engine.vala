@@ -1,3 +1,5 @@
+using Gtk;
+
 namespace Baobabs {
     public enum LoadState {
         IDLE,
@@ -31,6 +33,7 @@ namespace Baobabs {
         public abstract void set_user_agent(string ua);
         public abstract void focus();
 
-        public abstract void set_bounds(int x, int y, int width, int height, int win_w, int win_h);
+        public abstract void attach(Gtk.Widget host, string? profile_dir = null);
+        public abstract void start();
     }
 }

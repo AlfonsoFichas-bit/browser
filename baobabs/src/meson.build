@@ -4,7 +4,7 @@ baobabs_core_sources = files(
   'core/epoch.vala',
   'core/plist.vala',
   'engine/engine.vala',
-  'engine/webview2.vala',
+  'engine/factory.vala',
   'ui/window.vala',
   'bookmarks/model.vala',
   'bookmarks/loader.vala',
@@ -16,10 +16,13 @@ extra_includes = [include_directories('.')]
 
 if is_windows
   baobabs_core_sources += files(
+    'engine/webview2.vala',
     'engine/webview2/webview2_bridge.vapi',
     'engine/webview2/webview2_bridge.cpp',
     'engine/webview2/webview2_bridge_helper.c',
   )
+
+  # Linux (futuro): baobabs_core_sources += files('engine/webkit.vala')
   extra_includes += include_directories(
     '../deps/webview2/pkg/build/native/include',
     'engine/webview2',
