@@ -146,7 +146,10 @@ public int main (string[] args) {
     Environment.set_variable("DBUS_SESSION_BUS_ADDRESS", "unix:path=/dev/null", true);
     Environment.set_variable("GTK_A11Y", "none", true);
     Environment.set_variable("WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS", "1", true);
-    Gtk.init();
+
+    if (!Gtk.init_check()) {
+        return 77;
+    }
     Test.init(ref args);
 
     Test.add_func("/WebKitEngine/create_and_attach", TestWebKitEngine.test_create_and_attach);

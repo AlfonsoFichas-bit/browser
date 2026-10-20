@@ -6,6 +6,8 @@ namespace Baobabs {
         private string pending_url = "about:blank";
         private string requested_uri = "about:blank";
         private bool load_failed_flag = false;
+        private string pending_user_agent = "";
+        private double pending_zoom = 1.0;
 
         // Properties implementation
         public string url {
@@ -18,7 +20,17 @@ namespace Baobabs {
             set {}
         }
 
-        public double zoom { get; set; default = 1.0; }
+        public double zoom {
+            get {
+                return web_view != null ? web_view.zoom_level : pending_zoom;
+            }
+            set {
+                pending_zoom = value;
+                if (web_view != null) {
+                    web_view.zoom_level = value;
+                }
+            }
+        }
 
         public bool can_go_back {
             get { return web_view != null ? web_view.can_go_back() : false; }
@@ -74,11 +86,28 @@ namespace Baobabs {
         }
 
         public void execute_script(string js) {
-            // Group 5
+            if (web_view == null) {
+                return;
+            }
+            web_view.evaluate_javascript.begin(js, -1, null, null, null, (obj, res) => {
+                try {
+                    web_view.evaluate_javascript.end(res);
+                } catch (GLib.Error e) {
+                    // No hay canal de error en el contrato; ignora o loguea.
+                    GLib.warning("execute_script: %s", e.message);
+                }
+            });
         }
 
         public void set_user_agent(string ua) {
-            // Group 5
+            pending_user_agent = ua;
+            if (web_view != null) {
+                // Settings.user_agent es una propiedad 'construct-only'
+                // Un cambio posterior requiere la recarga del web_view tras reconstruir Settings.
+                // Esta limitación documentada provoca que el cambio solo será efectivo en
+                // nuevas construcciones o attach()
+                GLib.warning("set_user_agent was called after web_view initialization. Change will not apply to current view.");
+            }
         }
 
         public void focus() {
@@ -104,12 +133,21 @@ namespace Baobabs {
             }
 
             // Group 2: Create WebKitWebView and insert into the host
-            var settings = new WebKit.Settings();
+            WebKit.Settings settings;
+            if (pending_user_agent != "") {
+                settings = (WebKit.Settings)GLib.Object.new(typeof(WebKit.Settings),
+                    "user-agent", pending_user_agent);
+            } else {
+                settings = new WebKit.Settings();
+            }
+
             web_view = (WebKit.WebView)GLib.Object.new(typeof(WebKit.WebView),
                 "network-session", session,
                 "settings", settings
             );
 
+            // Set pending configurations
+            web_view.zoom_level = pending_zoom;
             web_view.hexpand = true;
             web_view.vexpand = true;
 

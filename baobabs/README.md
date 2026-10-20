@@ -10,7 +10,7 @@ Clon fiel al espíritu de Safari 5.1.7: interfaz simple, TopSites, ReadingList, 
 
 - **Lenguaje**: Vala + GObject
 - **UI**: GTK 4
-- **Motor web**: WebView2 (Windows-first). Preparado para WebKitGTK (Linux).
+- **Motor web**: WebKitGTK (Linux) como motor por defecto. WebView2 disponible en Windows.
 - **Build**: Meson
 
 ## Arquitectura
@@ -26,6 +26,12 @@ Basado en el análisis de `safari/HABITAT.md`:
 ## Estado
 
 Fase inicial. Ver `safari/HABITAT.md` para documentación completa de ingeniería inversa.
+
+### Motor Linux (WebKitGTK)
+
+- **Activo y funcionando**: El proyecto compila y usa WebKitGTK 6.0 como motor por defecto para la versión en Linux. En Windows se mantiene el uso de WebView2.
+- **Perfil Persistente**: Los datos del motor se almacenan de manera persistente utilizando el directorio del perfil del usuario (por ejemplo, `~/.config/baobabs/default/webkit`).
+- **Limitación en scripts**: La función de ejecutar scripts en páginas usando el motor Linux (`execute_script`) opera de forma asíncrona "fire-and-forget", en la que el resultado es descartado de inmediato.
 
 ## Licencia
 
