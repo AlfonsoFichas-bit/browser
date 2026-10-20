@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.baobabs.browser</id>
+  <name>Baobabs</name>
+  <summary>Navegador web minimalista</summary>
+  <project_license>GPL-3.0+</project_license>
+  <metadata_license>CC0-1.0</metadata_license>
+  <description>
+    <p>
+      Baobabs es un navegador web minimalista inspirado en Safari 5.1.7,
+      construido con GTK4 y WebKitGTK para una experiencia fluida y rápida en Linux.
+    </p>
+  </description>
+  <launchable type="desktop-id">org.baobabs.browser.desktop</launchable>
+  <url type="homepage">https://github.com/AlfonsoFichas-bit/browser</url>
+  <developer id="org.baobabs">
+    <name>Alfonso Fichas</name>
+  </developer>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.1.0" date="2023-10-01"/>
+  </releases>
+</component>

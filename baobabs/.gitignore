@@ -61,4 +61,5 @@ tests/*/output/
 .flatpak-builder/
 
 # Cache
-.cache/
+.cache/packaging/deb/staging
+packaging/deb/*.deb

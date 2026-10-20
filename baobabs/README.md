@@ -10,7 +10,7 @@ Clon fiel al espíritu de Safari 5.1.7: interfaz simple, TopSites, ReadingList, 
 
 - **Lenguaje**: Vala + GObject
 - **UI**: GTK 4
-- **Motor web**: WebKitGTK (Linux) como motor por defecto. WebView2 disponible en Windows.
+- **Motor web**: WebView2 (Windows-first). Preparado para WebKitGTK (Linux).
 - **Build**: Meson
 
 ## Arquitectura
@@ -27,11 +27,34 @@ Basado en el análisis de `safari/HABITAT.md`:
 
 Fase inicial. Ver `safari/HABITAT.md` para documentación completa de ingeniería inversa.
 
-### Motor Linux (WebKitGTK)
+## Instalación (Linux)
 
-- **Activo y funcionando**: El proyecto compila y usa WebKitGTK 6.0 como motor por defecto para la versión en Linux. En Windows se mantiene el uso de WebView2.
-- **Perfil Persistente**: Los datos del motor se almacenan de manera persistente utilizando el directorio del perfil del usuario (por ejemplo, `~/.config/baobabs/default/webkit`).
-- **Limitación en scripts**: La función de ejecutar scripts en páginas usando el motor Linux (`execute_script`) opera de forma asíncrona "fire-and-forget", en la que el resultado es descartado de inmediato.
+Baobabs ofrece soporte multimedia integral mediante GStreamer para WebKitGTK 6.0 en Linux (códecs como H.264 y AAC).
+
+### Método 1: Instalación vía Flatpak (Recomendado)
+El método Flatpak instala y configura un entorno completo haciendo uso del runtime de GNOME, lo que garantiza el correcto funcionamiento de los videos y sonidos de inmediato.
+
+```bash
+flatpak-builder --user --install build-flatpak packaging/flatpak/org.baobabs.browser.yml --force-clean
+flatpak run org.baobabs.browser
+```
+
+### Método 2: Paquete Debian (.deb)
+Baobabs cuenta con un script que permite generar un archivo `.deb`.
+
+```bash
+cd packaging/deb
+./build.sh
+```
+
+Al instalar el archivo `.deb`, dependencias vitales de códecs se instalan de manera recomendada mediante GStreamer. En Ubuntu y derivadas, es necesario asegurarse que el repositorio **multiverse** esté activado para que `apt` pueda encontrar los plugins multimedia `bad` y `ugly`.
+
+```bash
+sudo add-apt-repository multiverse
+sudo apt update
+sudo dpkg -i packaging/deb/baobabs_0.1.0_amd64.deb
+sudo apt-get install -f
+```
 
 ## Licencia
 

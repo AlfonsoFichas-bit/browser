@@ -1,0 +1,10 @@
+Package: baobabs
+Version: 0.1.0
+Section: web
+Priority: optional
+Architecture: amd64
+Maintainer: Alfonso Fichas <alfonso.fichas@example.com>
+Description: Navegador web minimalista
+ Baobabs es un navegador web rápido y minimalista, construido en Vala y GTK4.
+Depends: libgtk-4-1, libwebkitgtk-6.0-4, libglib2.0-0, libgee-0.8-2
+Recommends: gstreamer1.0-libav, gstreamer1.0-plugins-bad, gstreamer1.0-plugins-ugly, gstreamer1.0-vaapi

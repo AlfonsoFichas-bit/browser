@@ -3,7 +3,8 @@ namespace Baobabs {
 #if WINDOWS
         return new WebView2Engine();
 #else
-        return new WebKitEngine();
+        // Linux: WebKitEngine se añadirá cuando exista
+        assert_not_reached();
 #endif
     }
 }

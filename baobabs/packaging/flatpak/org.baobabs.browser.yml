@@ -1,0 +1,16 @@
+app-id: org.baobabs.browser
+runtime: org.gnome.Platform
+runtime-version: '46'
+sdk: org.gnome.Sdk
+command: baobabs
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=network
+  - --device=dri
+modules:
+  - name: baobabs
+    buildsystem: meson
+    sources:
+      - type: dir
+        path: ../../

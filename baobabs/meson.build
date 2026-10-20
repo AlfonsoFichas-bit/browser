@@ -56,6 +56,7 @@ if is_windows
 endif
 
 subdir('src')
+subdir('data')
 
 # --- Tests --------------------------------------------------------------------
 subdir('tests')
