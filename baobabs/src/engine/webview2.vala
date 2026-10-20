@@ -55,6 +55,14 @@ namespace Baobabs {
         private string? profile_dir;
         private void* hwnd;
 
+        // Cache for bounds deduplication
+        private int last_x = -1;
+        private int last_y = -1;
+        private int last_w = -1;
+        private int last_h = -1;
+        private int last_margin_x = -1;
+        private int last_margin_y = -1;
+
         public WebView2Engine() {
             Object();
             bridge = new WebView2.Bridge();
@@ -156,9 +164,9 @@ namespace Baobabs {
                 surface.layout.connect((w, h) => update_bounds());
             } else {
                 // Fallback: si aún no está mapeada, intentamos conectarlo cuando se mapee
-                toplevel.notify["realized"].connect((obj, pspec) => {
+                toplevel.realize.connect((w) => {
                     var s = toplevel.get_surface();
-                    if (s != null) s.layout.connect((w, h) => update_bounds());
+                    if (s != null) s.layout.connect((sw, sh) => update_bounds());
                 });
             }
 
@@ -216,7 +224,23 @@ namespace Baobabs {
 
             Graphene.Rect rect;
             if (this.host.compute_bounds(toplevel, out rect)) {
-                this.set_bounds((int)rect.origin.x, (int)rect.origin.y, (int)rect.size.width, (int)rect.size.height, margin_x, margin_y);
+                int new_x = (int)rect.origin.x;
+                int new_y = (int)rect.origin.y;
+                int new_w = (int)rect.size.width;
+                int new_h = (int)rect.size.height;
+
+                if (new_x == last_x && new_y == last_y && new_w == last_w && new_h == last_h && margin_x == last_margin_x && margin_y == last_margin_y) {
+                    return; // Deduplicate calls
+                }
+
+                last_x = new_x;
+                last_y = new_y;
+                last_w = new_w;
+                last_h = new_h;
+                last_margin_x = margin_x;
+                last_margin_y = margin_y;
+
+                this.set_bounds(new_x, new_y, new_w, new_h, margin_x, margin_y);
             }
         }
 
