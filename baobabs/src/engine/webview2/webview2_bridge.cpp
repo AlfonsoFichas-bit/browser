@@ -39,8 +39,8 @@ struct WebView2Bridge {
     int logical_y;
     int logical_w;
     int logical_h;
-    int logical_win_w;
-    int logical_win_h;
+    int margin_x;
+    int margin_y;
 
     WebView2URLChangedCallback url_cb;
     void* url_user_data;
@@ -76,8 +76,8 @@ struct WebView2Bridge {
           logical_y(48),
           logical_w(0),
           logical_h(0),
-          logical_win_w(0),
-          logical_win_h(0),
+          margin_x(0),
+          margin_y(0),
           url_cb(nullptr),
           url_user_data(nullptr),
           url_destroy(nullptr),
@@ -106,16 +106,6 @@ struct WebView2Bridge {
             int phys_width = clientRect.right - clientRect.left;
             int phys_height = clientRect.bottom - clientRect.top;
 
-            int margin_x = 0;
-            int margin_y = 0;
-
-            if (logical_win_w > 0 && phys_width > logical_win_w) {
-                margin_x = (phys_width - logical_win_w) / 2;
-            }
-            if (logical_win_h > 0 && phys_height > logical_win_h) {
-                margin_y = (phys_height - logical_win_h) / 2;
-            }
-
             RECT bounds;
             if (logical_w > 0 && logical_h > 0) {
                 bounds.left = logical_x + margin_x;
@@ -135,8 +125,8 @@ struct WebView2Bridge {
             HRESULT hr = webviewController->put_Bounds(bounds);
             webviewController->put_IsVisible(TRUE);
 
-            fprintf(stderr, "[WebView2 Bridge] UpdateBounds (logical rect: %d,%d %dx%d, win: %dx%d): left=%ld top=%ld right=%ld bottom=%ld (put_Bounds: 0x%08lX)\n",
-                    logical_x, logical_y, logical_w, logical_h, logical_win_w, logical_win_h,
+            fprintf(stderr, "[WebView2 Bridge] UpdateBounds (logical rect: %d,%d %dx%d, margins: %dx%d, physical: %dx%d): left=%ld top=%ld right=%ld bottom=%ld (put_Bounds: 0x%08lX)\n",
+                    logical_x, logical_y, logical_w, logical_h, margin_x, margin_y, phys_width, phys_height,
                     bounds.left, bounds.top, bounds.right, bounds.bottom, (unsigned long)hr);
             fflush(stderr);
 
@@ -575,14 +565,14 @@ void webview2_bridge_focus(WebView2Bridge* bridge) {
     }
 }
 
-void webview2_bridge_set_bounds(WebView2Bridge* bridge, int x, int y, int width, int height, int win_w, int win_h) {
+void webview2_bridge_set_bounds(WebView2Bridge* bridge, int x, int y, int width, int height, int m_x, int m_y) {
     if (bridge) {
         bridge->logical_x = x;
         bridge->logical_y = y;
         bridge->logical_w = width;
         bridge->logical_h = height;
-        bridge->logical_win_w = win_w;
-        bridge->logical_win_h = win_h;
+        bridge->margin_x = m_x;
+        bridge->margin_y = m_y;
         bridge->UpdateBounds();
     }
 }

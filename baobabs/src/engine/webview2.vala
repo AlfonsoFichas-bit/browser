@@ -112,9 +112,9 @@ namespace Baobabs {
             });
         }
 
-        private void set_bounds(int x, int y, int width, int height, int win_w, int win_h) {
+        private void set_bounds(int x, int y, int width, int height, int margin_x, int margin_y) {
             if (bridge != null) {
-                bridge.set_bounds(x, y, width, height, win_w, win_h);
+                bridge.set_bounds(x, y, width, height, margin_x, margin_y);
             }
         }
 
@@ -148,6 +148,18 @@ namespace Baobabs {
 
             if (this.hwnd == null) {
                 this.hwnd = WebView2.get_widget_hwnd(toplevel);
+            }
+
+            // Suscribirse al evento de layout de la superficie subyacente para atajar cambios físicos asincrónicos
+            var surface = toplevel.get_surface();
+            if (surface != null) {
+                surface.layout.connect((w, h) => update_bounds());
+            } else {
+                // Fallback: si aún no está mapeada, intentamos conectarlo cuando se mapee
+                toplevel.notify["realized"].connect((obj, pspec) => {
+                    var s = toplevel.get_surface();
+                    if (s != null) s.layout.connect((w, h) => update_bounds());
+                });
             }
 
             if (this.hwnd != null) {
@@ -187,9 +199,24 @@ namespace Baobabs {
             int win_w = toplevel.get_width();
             int win_h = toplevel.get_height();
 
+            int margin_x = 0;
+            int margin_y = 0;
+
+            var surface = toplevel.get_surface();
+            if (surface != null) {
+                int phys_w = surface.get_width();
+                int phys_h = surface.get_height();
+                if (phys_w > win_w) {
+                    margin_x = (phys_w - win_w) / 2;
+                }
+                if (phys_h > win_h) {
+                    margin_y = (phys_h - win_h) / 2;
+                }
+            }
+
             Graphene.Rect rect;
             if (this.host.compute_bounds(toplevel, out rect)) {
-                this.set_bounds((int)rect.origin.x, (int)rect.origin.y, (int)rect.size.width, (int)rect.size.height, win_w, win_h);
+                this.set_bounds((int)rect.origin.x, (int)rect.origin.y, (int)rect.size.width, (int)rect.size.height, margin_x, margin_y);
             }
         }
 
