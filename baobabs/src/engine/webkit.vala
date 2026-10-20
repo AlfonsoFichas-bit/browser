@@ -4,6 +4,8 @@ namespace Baobabs {
     public class WebKitEngine : GLib.Object, BrowserEngine {
         private WebKit.WebView web_view;
         private string pending_url = "about:blank";
+        private string requested_uri = "about:blank";
+        private bool load_failed_flag = false;
 
         // Properties implementation
         public string url {
@@ -63,6 +65,9 @@ namespace Baobabs {
 
         public void load_uri(string uri) {
             pending_url = uri;
+            requested_uri = uri;
+            load_failed_flag = false;
+
             if (web_view != null) {
                 web_view.load_uri(uri);
             }
@@ -116,8 +121,27 @@ namespace Baobabs {
                         load_state_changed(LoadState.LOADING);
                         break;
                     case WebKit.LoadEvent.FINISHED:
-                        load_finished(true, null);
-                        load_state_changed(LoadState.FINISHED);
+                        bool success = true;
+                        string error_msg = null;
+
+                        if (load_failed_flag) {
+                            success = false;
+                        } else if (web_view.uri != null && web_view.uri != requested_uri) {
+                            success = false;
+                            error_msg = "Connection Refused or URL mismatch";
+                            load_failed_flag = true;
+                        }
+
+                        if (success) {
+                            load_finished(true, null);
+                            load_state_changed(LoadState.FINISHED);
+                        } else {
+                            if (error_msg == null) {
+                                error_msg = "Unknown error or DNS issue";
+                            }
+                            load_finished(false, error_msg);
+                            load_state_changed(LoadState.FAILED);
+                        }
                         break;
                     default:
                         break;
@@ -126,6 +150,7 @@ namespace Baobabs {
             });
 
             web_view.load_failed.connect((event, failing_uri, error) => {
+                load_failed_flag = true;
                 load_finished(false, error.message);
                 load_state_changed(LoadState.FAILED);
                 update_navigation_actions();

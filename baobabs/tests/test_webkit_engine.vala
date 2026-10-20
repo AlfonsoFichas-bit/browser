@@ -35,6 +35,110 @@ public class TestWebKitEngine : GLib.Object {
         GLib.FileUtils.remove(GLib.Path.build_filename(test_dir, "webkit"));
         GLib.FileUtils.remove(test_dir);
     }
+
+    public static void test_navigation_success() {
+        var engine = new Baobabs.WebKitEngine();
+        var window = new Gtk.Window();
+        var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+        var widget = new Gtk.DrawingArea();
+        box.append(widget);
+        window.set_child(box);
+        engine.attach(widget, null);
+
+        var loop = new GLib.MainLoop();
+        bool is_finished = false;
+        bool was_success = false;
+
+        engine.load_finished.connect((success, error) => {
+            is_finished = true;
+            was_success = success;
+            loop.quit();
+        });
+
+        engine.load_uri("about:blank");
+
+        GLib.Timeout.add_seconds(3, () => {
+            loop.quit();
+            return false;
+        });
+
+        loop.run();
+
+        assert(is_finished);
+        assert(was_success);
+    }
+
+    public static void test_navigation_closed_port() {
+        var engine = new Baobabs.WebKitEngine();
+        var window = new Gtk.Window();
+        var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+        var widget = new Gtk.DrawingArea();
+        box.append(widget);
+        window.set_child(box);
+        engine.attach(widget, null);
+
+        var loop = new GLib.MainLoop();
+        bool is_finished = false;
+        bool was_success = true;
+
+        engine.load_finished.connect((success, error) => {
+            is_finished = true;
+            was_success = success;
+            loop.quit();
+        });
+
+        // Case A - closed port
+        engine.load_uri("http://127.0.0.1:1/x");
+
+        GLib.Timeout.add_seconds(3, () => {
+            loop.quit();
+            return false;
+        });
+
+        loop.run();
+
+        assert(is_finished);
+        assert(!was_success);
+    }
+
+    public static void test_navigation_invalid_dns() {
+        var engine = new Baobabs.WebKitEngine();
+        var window = new Gtk.Window();
+        var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+        var widget = new Gtk.DrawingArea();
+        box.append(widget);
+        window.set_child(box);
+        engine.attach(widget, null);
+
+        var loop = new GLib.MainLoop();
+        bool is_finished = false;
+        bool was_success = true;
+        int finish_calls = 0;
+
+        engine.load_finished.connect((success, error) => {
+            is_finished = true;
+            was_success = success;
+            finish_calls++;
+
+            // Wait for 2nd cycle of WebKit (error page)
+            if (finish_calls >= 2) {
+                loop.quit();
+            }
+        });
+
+        // Case B - invalid DNS
+        engine.load_uri("http://non-existent.invalid");
+
+        GLib.Timeout.add_seconds(3, () => {
+            loop.quit();
+            return false;
+        });
+
+        loop.run();
+
+        assert(is_finished);
+        assert(!was_success);
+    }
 }
 
 public int main (string[] args) {
@@ -46,6 +150,9 @@ public int main (string[] args) {
     Test.init(ref args);
 
     Test.add_func("/WebKitEngine/create_and_attach", TestWebKitEngine.test_create_and_attach);
+    Test.add_func("/WebKitEngine/navigation_success", TestWebKitEngine.test_navigation_success);
+    Test.add_func("/WebKitEngine/navigation_closed_port", TestWebKitEngine.test_navigation_closed_port);
+    Test.add_func("/WebKitEngine/navigation_invalid_dns", TestWebKitEngine.test_navigation_invalid_dns);
 
     return Test.run();
 }
