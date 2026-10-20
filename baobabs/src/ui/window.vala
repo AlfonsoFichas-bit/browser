@@ -17,6 +17,8 @@ namespace Baobabs {
         private Button forward_btn;
         private Button reload_btn;
         private SizeTrackingArea web_area;
+        private FavoritesBar favorites_bar;
+        private Bookmarks.Store bookmarks_store;
         private bool is_loading = false;
         private string default_url = "https://duckduckgo.com";
 
@@ -78,12 +80,23 @@ namespace Baobabs {
             url_entry.activate.connect(on_url_activated);
             header.set_title_widget(url_entry);
 
+            // Modelos
+            bookmarks_store = new Bookmarks.Store();
+            bookmarks_store.root = Bookmarks.Defaults.seed();
+
             // Área de visualización web
             web_area = new SizeTrackingArea();
             web_area.hexpand = true;
             web_area.vexpand = true;
 
+            // Barra de favoritos
+            favorites_bar = new FavoritesBar(bookmarks_store);
+            favorites_bar.open_url.connect((url) => {
+                engine.load_uri(url);
+            });
+
             var box = new Box(Orientation.VERTICAL, 0);
+            box.append(favorites_bar);
             box.append(web_area);
             set_child(box);
 
