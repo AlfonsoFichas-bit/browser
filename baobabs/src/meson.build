@@ -15,6 +15,8 @@ baobabs_core_sources = files(
 extra_includes = [include_directories('.')]
 
 if is_windows
+  add_project_arguments('-D', 'WINDOWS', language: 'vala')
+
   baobabs_core_sources += files(
     'engine/webview2.vala',
     'engine/webview2/webview2_bridge.vapi',
