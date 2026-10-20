@@ -24,7 +24,6 @@ if is_windows
     'engine/webview2/webview2_bridge_helper.c',
   )
 
-  # Linux (futuro): baobabs_core_sources += files('engine/webkit.vala')
   extra_includes += include_directories(
     '../deps/webview2/pkg/build/native/include',
     'engine/webview2',
@@ -36,6 +35,8 @@ if is_windows
     output: 'WebView2Loader.dll',
     copy: true,
   )
+else
+  baobabs_core_sources += files('engine/webkit.vala')
 endif
 
 # Libreria estatica: la enlazan el ejecutable y los tests
