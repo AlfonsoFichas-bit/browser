@@ -44,7 +44,7 @@ public static int main(string[] args) {
         }
 
         string fixture_dir = cli_args[1];
-        string history_path = Path.build_filename(fixture_dir, "..", "..", "..", "safari", "History.plist");
+        string history_path = Path.build_filename(fixture_dir, "History.plist");
 
         try {
             var original = Plist.parse_file(history_path);

@@ -43,11 +43,13 @@ namespace Baobabs {
                 writer.write_be(out_bytes, offsets[i], offset_size);
             }
 
+            int root_idx = writer.obj_map.get(root.print(false));
+
             for (int i = 0; i < 6; i++) out_bytes.append(new uint8[] {0});
             out_bytes.append(new uint8[] { (uint8)offset_size });
             out_bytes.append(new uint8[] { (uint8)ref_size });
             writer.write_be(out_bytes, writer.objects.size, 8);
-            writer.write_be(out_bytes, 0, 8);
+            writer.write_be(out_bytes, (uint64)root_idx, 8);
             writer.write_be(out_bytes, offset_table_offset, 8);
 
             uint8[] result = new uint8[out_bytes.len];
@@ -57,7 +59,11 @@ namespace Baobabs {
 
         public static void write_file(string path, GLib.Variant root) throws PlistWriteError, GLib.FileError {
             var bytes = to_bytes(root);
-            GLib.FileUtils.set_data(path, bytes);
+            string tmp_path = path + ".tmp";
+            GLib.FileUtils.set_data(tmp_path, bytes);
+            if (GLib.FileUtils.rename(tmp_path, path) != 0) {
+                throw new GLib.FileError.FAILED("Failed to rename temporary plist file to final path");
+            }
         }
 
         private int flatten(GLib.Variant v) throws PlistWriteError {
@@ -128,7 +134,7 @@ namespace Baobabs {
                 string s = v.get_string();
                 bool is_ascii = true;
                 for (int i = 0; i < s.length; i++) {
-                    if (s[i] > 127) {
+                    if ((uint8)s[i] > 127) {
                         is_ascii = false;
                         break;
                     }
