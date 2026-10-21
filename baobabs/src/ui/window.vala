@@ -225,7 +225,6 @@ namespace Baobabs {
                 }
             }
             engine.load_uri(target);
-            web_area.grab_focus();
         }
     }
 }
