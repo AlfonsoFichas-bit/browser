@@ -15,7 +15,7 @@ namespace Baobabs {
         private Entry url_entry;
         private Button back_btn;
         private Button forward_btn;
-        private Button reload_btn;
+        private ToggleButton sidebar_toggle;
         private SizeTrackingArea web_area;
         private FavoritesBar favorites_bar;
         private Bookmarks.Store bookmarks_store;
@@ -43,6 +43,11 @@ namespace Baobabs {
             header.add_css_class("safari-headerbar");
             set_titlebar(header);
 
+            sidebar_toggle = new ToggleButton();
+            sidebar_toggle.icon_name = "sidebar-show-symbolic";
+            sidebar_toggle.tooltip_text = "Mostrar barra lateral";
+            header.pack_start(sidebar_toggle);
+
             // Botón Atrás
             back_btn = new Button.from_icon_name("go-previous-symbolic");
             back_btn.tooltip_text = "Atrás";
@@ -61,26 +66,45 @@ namespace Baobabs {
             });
             header.pack_start(forward_btn);
 
-            // Botón Recargar / Detener
-            reload_btn = new Button.from_icon_name("view-refresh-symbolic");
-            reload_btn.tooltip_text = "Recargar";
-            reload_btn.clicked.connect(() => {
-                if (is_loading) {
-                    engine.stop();
-                } else {
-                    engine.reload();
-                }
-            });
-            header.pack_start(reload_btn);
-
             // Barra de direcciones / búsqueda (estilo Safari)
             url_entry = new Entry();
             url_entry.hexpand = true;
             url_entry.placeholder_text = "Buscar o introducir dirección web";
             url_entry.text = this.default_url;
             url_entry.add_css_class("safari-url-entry");
+
+            url_entry.primary_icon_name = "text-x-generic-symbolic";
+            url_entry.secondary_icon_name = "view-refresh-symbolic";
+            url_entry.secondary_icon_tooltip_text = "Recargar";
+            url_entry.icon_press.connect((entry, pos) => {
+                if (pos == EntryIconPosition.SECONDARY) {
+                    if (is_loading) {
+                        engine.stop();
+                    } else {
+                        engine.reload();
+                    }
+                }
+            });
+
             url_entry.activate.connect(on_url_activated);
             header.set_title_widget(url_entry);
+
+            // Dummy buttons on the right
+            var dummy_tabs = new Button.from_icon_name("tab-new-symbolic");
+            dummy_tabs.tooltip_text = "Mostrar todas las pestañas";
+            header.pack_end(dummy_tabs);
+
+            var dummy_add = new Button.from_icon_name("list-add-symbolic");
+            dummy_add.tooltip_text = "Nueva pestaña";
+            header.pack_end(dummy_add);
+
+            var dummy_share = new Button.from_icon_name("emblem-shared-symbolic");
+            dummy_share.tooltip_text = "Compartir";
+            header.pack_end(dummy_share);
+
+            var dummy_dl = new Button.from_icon_name("folder-download-symbolic");
+            dummy_dl.tooltip_text = "Descargas";
+            header.pack_end(dummy_dl);
 
             // Modelos
             bookmarks_store = new Bookmarks.Store();
@@ -97,10 +121,23 @@ namespace Baobabs {
                 engine.load_uri(url);
             });
 
-            var box = new Box(Orientation.VERTICAL, 0);
-            box.append(favorites_bar);
-            box.append(web_area);
-            set_child(box);
+            var sidebar_scrolled = new ScrolledWindow();
+            sidebar_scrolled.set_child(favorites_bar);
+            sidebar_scrolled.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
+            sidebar_scrolled.width_request = 250;
+            sidebar_scrolled.add_css_class("sidebar-container");
+
+            sidebar_scrolled.visible = false;
+            sidebar_toggle.bind_property("active", sidebar_scrolled, "visible", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+
+            var separator = new Separator(Orientation.VERTICAL);
+            sidebar_toggle.bind_property("active", separator, "visible", BindingFlags.BIDIRECTIONAL | BindingFlags.SYNC_CREATE);
+
+            var main_box = new Box(Orientation.HORIZONTAL, 0);
+            main_box.append(sidebar_scrolled);
+            main_box.append(separator);
+            main_box.append(web_area);
+            set_child(main_box);
 
             // Conectar eventos del motor
             engine.url_changed.connect((new_url) => {
@@ -118,11 +155,11 @@ namespace Baobabs {
             engine.load_state_changed.connect((state) => {
                 is_loading = (state == LoadState.LOADING);
                 if (is_loading) {
-                    reload_btn.icon_name = "process-stop-symbolic";
-                    reload_btn.tooltip_text = "Detener";
+                    url_entry.secondary_icon_name = "process-stop-symbolic";
+                    url_entry.secondary_icon_tooltip_text = "Detener";
                 } else {
-                    reload_btn.icon_name = "view-refresh-symbolic";
-                    reload_btn.tooltip_text = "Recargar";
+                    url_entry.secondary_icon_name = "view-refresh-symbolic";
+                    url_entry.secondary_icon_tooltip_text = "Recargar";
                 }
             });
 
@@ -133,7 +170,6 @@ namespace Baobabs {
             engine.notify["can-go-forward"].connect(() => {
                 forward_btn.sensitive = engine.can_go_forward;
             });
-
         }
 
         public void start() {

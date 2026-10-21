@@ -7,7 +7,7 @@ namespace Baobabs {
         private Bookmarks.Store store;
 
         public FavoritesBar(Bookmarks.Store store) {
-            Object(orientation: Orientation.HORIZONTAL, spacing: 4);
+            Object(orientation: Orientation.VERTICAL, spacing: 4);
             this.store = store;
             this.vexpand = false;
             this.add_css_class("favorites-bar");
@@ -42,7 +42,14 @@ namespace Baobabs {
                 if (node.node_type == Bookmarks.NodeType.LEAF) {
                     var btn = new Button.with_label(display_title_for(node));
                     btn.add_css_class("favorites-item");
-                    // use unowned or a local variable to prevent capturing `node` variable reference inside closure loop
+                    btn.halign = Align.FILL;
+
+                    var label = btn.get_child() as Label;
+                    if (label != null) {
+                        label.halign = Align.START;
+                        label.ellipsize = Pango.EllipsizeMode.END;
+                    }
+
                     string url_to_open = node.url ?? "";
                     btn.clicked.connect(() => {
                         if (url_to_open.length > 0) {
@@ -51,18 +58,13 @@ namespace Baobabs {
                     });
                     container.append(btn);
                 } else if (node.node_type == Bookmarks.NodeType.LIST || node.node_type == Bookmarks.NodeType.PROXY) {
-                    var menu_btn = new MenuButton();
-                    menu_btn.label = display_title_for(node);
-                    menu_btn.add_css_class("favorites-item");
-
-                    var popover = new Popover();
+                    var expander = new Expander(display_title_for(node));
                     var vbox = new Box(Orientation.VERTICAL, 2);
-                    popover.set_child(vbox);
-                    menu_btn.popover = popover;
+                    vbox.margin_start = 12;
+                    expander.set_child(vbox);
 
                     build_level(vbox, node);
-
-                    container.append(menu_btn);
+                    container.append(expander);
                 }
             }
         }

@@ -1,12 +1,12 @@
-/* style.css - Safari 5.1 Light Theme Inspiration */
+/* style.css - Safari/macOS Modern Theme */
 
 window {
-    background-color: #ececec;
+    background-color: #f5f5f5;
 }
 
 /* HeaderBar styling */
 .safari-headerbar {
-    background: #e8e8e8;
+    background: #f5f5f5;
     border-bottom: 1px solid #d0d0d0;
     box-shadow: none;
     padding: 6px;
@@ -17,42 +17,56 @@ window {
     background: transparent;
     border: none;
     box-shadow: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    color: #333333;
+    border-radius: 6px;
+    padding: 6px;
+    color: #4a4a4a;
 }
 
 .safari-headerbar button:hover {
-    background-color: #d8d8d8;
+    background-color: #e5e5e5;
 }
 
 .safari-headerbar button:active,
 .safari-headerbar button:checked {
-    background-color: #cccccc;
-    color: rgb(32, 0, 127); /* Apple highlight blue */
+    background-color: #d8d8d8;
+    color: #000000;
 }
 
 /* URL Entry */
 .safari-url-entry {
-    background-color: #ffffff;
-    border: 1px solid #c0c0c0;
-    border-radius: 6px;
-    padding: 4px 8px;
+    background-color: #e3e3e3;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 6px 12px;
     color: #000000;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
+    min-height: 28px;
 }
 
-.safari-url-entry:focus {
-    border-color: rgb(32, 0, 127);
-    box-shadow: inset 0 1px 2px rgba(32, 0, 127, 0.2);
+.safari-url-entry:focus,
+.safari-url-entry:focus-within {
+    background-color: #ffffff;
+    border-color: #007aff;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
 }
 
-/* Favorites Bar */
+.safari-url-entry image {
+    color: #6e6e73;
+}
+
+.safari-url-entry image:hover {
+    color: #1d1d1f;
+}
+
+/* Sidebar / Favorites Bar */
+.sidebar-container {
+    background-color: #f5f5f5;
+    border-right: 1px solid #d0d0d0;
+}
+
 .favorites-bar {
-    background-color: #e8e8e8;
-    border-bottom: 1px solid #d0d0d0;
-    padding: 2px 4px;
-    min-height: 24px;
+    background-color: transparent;
+    padding: 8px;
 }
 
 /* Favorites Items (Leaves and Folders) */
@@ -60,18 +74,19 @@ window {
     background: transparent;
     border: none;
     box-shadow: none;
-    border-radius: 4px;
-    padding: 2px 8px;
+    border-radius: 6px;
+    padding: 6px 8px;
     color: #333333;
     font-size: 13px;
+    font-weight: 500;
 }
 
 .favorites-item:hover {
-    background-color: #d8d8d8;
+    background-color: #e5e5e5;
 }
 
 .favorites-item:active,
 .favorites-item:checked {
-    background-color: #cccccc;
-    color: rgb(32, 0, 127);
+    background-color: #d8d8d8;
+    color: #000000;
 }
