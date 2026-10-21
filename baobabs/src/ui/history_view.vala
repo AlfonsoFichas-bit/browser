@@ -7,6 +7,21 @@ namespace Baobabs {
         private History.Store store;
         private Gtk.Box content_box;
 
+        private const string[] DIAS = {
+            "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"
+        };
+        private const string[] MESES = {
+            "enero", "febrero", "marzo", "abril", "mayo", "junio",
+            "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+        };
+
+        private string fecha_en_espanol(GLib.DateTime d) {
+            int y, m, dd;
+            d.get_ymd(out y, out m, out dd);
+            int wd = d.get_day_of_week();
+            return "%s, %d de %s".printf(DIAS[wd % 7], dd, MESES[m - 1]);
+        }
+
         public HistoryView(History.Store store) {
             Object(orientation: Orientation.VERTICAL, spacing: 4);
             this.store = store;
@@ -76,12 +91,7 @@ namespace Baobabs {
                 } else if (yy == vy && ym == vm && yd == vd) {
                     group_title = "Ayer";
                 } else {
-                    group_title = visited.format("%A, %d de %B");
-                    // Capitalizar primera letra para que quede bonito (por ej. "Lunes, ...")
-                    if (group_title != null && group_title.length > 0) {
-                        string first_char = group_title.substring(0, 1).up();
-                        group_title = first_char + group_title.substring(1);
-                    }
+                    group_title = fecha_en_espanol(visited);
                 }
 
                 if (group_title != current_group) {
