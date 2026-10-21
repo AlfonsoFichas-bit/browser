@@ -19,6 +19,8 @@ namespace Baobabs {
         private SizeTrackingArea web_area;
         private FavoritesBar favorites_bar;
         private Bookmarks.Store bookmarks_store;
+        private HistoryView history_view;
+        private History.Store history_store;
         private bool is_loading = false;
         private string default_url = "https://duckduckgo.com";
 
@@ -109,6 +111,7 @@ namespace Baobabs {
             // Modelos
             bookmarks_store = new Bookmarks.Store();
             bookmarks_store.root = Bookmarks.Defaults.seed();
+            history_store = new History.Store();
 
             // Área de visualización web
             web_area = new SizeTrackingArea();
@@ -121,8 +124,28 @@ namespace Baobabs {
                 engine.load_uri(url);
             });
 
+            // Vista de historial
+            history_view = new HistoryView(history_store);
+            history_view.open_url.connect((url) => {
+                engine.load_uri(url);
+            });
+
+            var sidebar_stack = new Stack();
+            sidebar_stack.add_titled(favorites_bar, "favoritos", "Marcadores");
+            sidebar_stack.add_titled(history_view, "historial", "Historial");
+
+            var switcher = new StackSwitcher();
+            switcher.stack = sidebar_stack;
+            switcher.halign = Align.CENTER;
+            switcher.margin_top = 8;
+            switcher.margin_bottom = 8;
+
+            var sidebar_box = new Box(Orientation.VERTICAL, 0);
+            sidebar_box.append(switcher);
+            sidebar_box.append(sidebar_stack);
+
             var sidebar_scrolled = new ScrolledWindow();
-            sidebar_scrolled.set_child(favorites_bar);
+            sidebar_scrolled.set_child(sidebar_box);
             sidebar_scrolled.set_policy(PolicyType.NEVER, PolicyType.AUTOMATIC);
             sidebar_scrolled.width_request = 250;
             sidebar_scrolled.add_css_class("sidebar-container");
@@ -160,6 +183,13 @@ namespace Baobabs {
                 } else {
                     url_entry.secondary_icon_name = "view-refresh-symbolic";
                     url_entry.secondary_icon_tooltip_text = "Recargar";
+                }
+            });
+
+            engine.load_finished.connect((success, error) => {
+                if (!success) return;
+                if (engine.url != null && engine.url.length > 0) {
+                    history_store.record_visit(engine.url, engine.title);
                 }
             });
 

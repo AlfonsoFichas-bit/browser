@@ -7,6 +7,7 @@ baobabs_core_sources = files(
   'engine/factory.vala',
   'ui/window.vala',
   'ui/favorites_bar.vala',
+  'ui/history_view.vala',
   'bookmarks/model.vala',
   'bookmarks/loader.vala',
   'bookmarks/store.vala',

@@ -35,6 +35,45 @@ window {
     color: #000000;
 }
 
+/* History */
+.history-empty {
+    color: #999999;
+    font-size: 13px;
+}
+
+.history-date-header {
+    color: #888888;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.history-item {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.history-item:hover {
+    background-color: #e5e5e5;
+}
+
+.history-item:active,
+.history-item:checked {
+    background-color: #d8d8d8;
+    color: #000000;
+}
+
+/* StackSwitcher inside sidebar */
+.sidebar-container stackswitcher {
+    padding: 0 8px;
+}
+
 /* URL Entry */
 .safari-url-entry {
     background-color: #e3e3e3;
