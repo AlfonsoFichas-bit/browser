@@ -9,7 +9,8 @@ window {
     background: #f5f5f5;
     border-bottom: 1px solid #d0d0d0;
     box-shadow: none;
-    padding: 6px;
+    padding: 2px 6px;
+    min-height: 0;
 }
 
 /* HeaderBar Buttons */
@@ -18,7 +19,9 @@ window {
     border: none;
     box-shadow: none;
     border-radius: 6px;
-    padding: 6px;
+    padding: 4px;
+    min-height: 0;
+    min-width: 0;
     color: #4a4a4a;
 }
 
@@ -36,11 +39,11 @@ window {
 .safari-url-entry {
     background-color: #e3e3e3;
     border: 1px solid transparent;
-    border-radius: 8px;
-    padding: 6px 12px;
+    border-radius: 7px;
+    padding: 3px 10px;
     color: #000000;
     box-shadow: none;
-    min-height: 28px;
+    min-height: 22px;
 }
 
 .safari-url-entry:focus,
