@@ -32,6 +32,7 @@ namespace Baobabs {
         public abstract void execute_script(string js);
         public abstract void set_user_agent(string ua);
         public abstract void focus();
+        public abstract void unfocus();
 
         public abstract void attach(Gtk.Widget host, string? profile_dir = null);
         public abstract void start();

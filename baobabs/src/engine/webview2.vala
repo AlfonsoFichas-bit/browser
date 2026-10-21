@@ -293,5 +293,11 @@ namespace Baobabs {
                 bridge.focus();
             }
         }
+
+        public void unfocus() {
+            if (bridge != null && _is_ready) {
+                bridge.unfocus();
+            }
+        }
     }
 }

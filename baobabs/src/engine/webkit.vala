@@ -116,6 +116,10 @@ namespace Baobabs {
             }
         }
 
+        public void unfocus() {
+            // No-op for WebKitGTK. Focus management is handled properly by GTK natively.
+        }
+
         public void attach(Gtk.Widget host, string? profile_dir = null) {
             // Group 3: Perfil persistente
             WebKit.NetworkSession session = null;
