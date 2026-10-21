@@ -112,6 +112,10 @@ namespace Baobabs {
             bookmarks_store = new Bookmarks.Store();
             bookmarks_store.root = Bookmarks.Defaults.seed();
             history_store = new History.Store();
+            history_store.load(Config.get_instance().history_path);
+            history_store.changed.connect(() => {
+                history_store.save(Config.get_instance().history_path);
+            });
 
             // Área de visualización web
             web_area = new SizeTrackingArea();

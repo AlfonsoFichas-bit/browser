@@ -1,0 +1,14 @@
+--- baobabs/src/core/plist_writer.vala
++++ baobabs/src/core/plist_writer.vala
+@@ -137,13 +137,13 @@
+                     write_count(out_bytes, 0x50, s.length);
+                     if (s.length > 0) out_bytes.append(s.data);
+                 } else {
+-                    uint16[] u16 = null;
++                    string16 u16 = null;
+                     try {
+                         long items_read, items_written;
+                         u16 = s.to_utf16(-1, out items_read, out items_written);
+                     } catch (GLib.ConvertError e) { }
+
+                     if (u16 != null) {

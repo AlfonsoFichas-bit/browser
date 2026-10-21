@@ -24,6 +24,15 @@ test('plist + bookmarks loader', test_plist,
   args: [meson.current_source_dir() / 'fixtures'],
 )
 
+test_plist_writer = executable('test-plist-writer',
+  files('test_plist_writer.vala'),
+  dependencies: baobabs_core_dep,
+)
+
+test('plist writer round-trip', test_plist_writer,
+  args: [meson.current_source_dir() / 'fixtures'],
+)
+
 if not is_windows
   test_webkit = executable('test-webkit',
     files('test_webkit_engine.vala'),

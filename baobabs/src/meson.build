@@ -3,6 +3,7 @@ baobabs_core_sources = files(
   'core/utils.vala',
   'core/epoch.vala',
   'core/plist.vala',
+  'core/plist_writer.vala',
   'engine/engine.vala',
   'engine/factory.vala',
   'ui/window.vala',
