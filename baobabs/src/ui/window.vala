@@ -91,6 +91,13 @@ namespace Baobabs {
             url_entry.activate.connect(on_url_activated);
             header.set_title_widget(url_entry);
 
+            // Evitar atrapamiento de foco de WebView2
+            var focus_ctrl = new EventControllerFocus();
+            focus_ctrl.enter.connect(() => {
+                engine.unfocus();
+            });
+            url_entry.add_controller(focus_ctrl);
+
             // Dummy buttons on the right
             var dummy_tabs = new Button.from_icon_name("tab-new-symbolic");
             dummy_tabs.tooltip_text = "Mostrar todas las pestañas";

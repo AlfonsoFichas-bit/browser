@@ -565,6 +565,18 @@ void webview2_bridge_focus(WebView2Bridge* bridge) {
     }
 }
 
+void webview2_bridge_unfocus(WebView2Bridge* bridge) {
+    if (bridge && bridge->hwnd) {
+        // Obtenemos la ventana superior (la ventana GTK nativa)
+        HWND toplevel = GetAncestor((HWND)bridge->hwnd, GA_ROOT);
+        if (toplevel) {
+            SetFocus(toplevel);
+        } else {
+            SetFocus((HWND)bridge->hwnd);
+        }
+    }
+}
+
 void webview2_bridge_set_bounds(WebView2Bridge* bridge, int x, int y, int width, int height, int m_x, int m_y) {
     if (bridge) {
         bridge->logical_x = x;

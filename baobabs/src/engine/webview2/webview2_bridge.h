@@ -72,6 +72,7 @@ void webview2_bridge_execute_script(WebView2Bridge* bridge, const char* js);
 void webview2_bridge_set_zoom(WebView2Bridge* bridge, double zoom);
 double webview2_bridge_get_zoom(WebView2Bridge* bridge);
 void webview2_bridge_focus(WebView2Bridge* bridge);
+void webview2_bridge_unfocus(WebView2Bridge* bridge);
 
 // Dimensiones y posición
 void webview2_bridge_set_bounds(WebView2Bridge* bridge, int x, int y, int width, int height, int margin_x, int margin_y);
