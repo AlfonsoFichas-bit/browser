@@ -2,7 +2,9 @@
 
 **Fecha:** 2026-10-20
 **Estado:** brief pendiente de entrega a Jules
-**Rama objetivo:** `master` (base `d81d4c9`)
+**Rama objetivo:** `master` (base `6504143`). Partir **siempre del último master**,
+que ya incluye el ajuste de altura del HeaderBar. No partir de `d81d4c9`: eso
+perdería ese ajuste.
 **Bloque anterior:** `baobabs/docs/bloque-1.5-aspecto-visual.md`
 
 ---
@@ -255,17 +257,16 @@ engine.load_finished.connect((success, error) => {
   `bottom−top` = alto de `web_area`.
 - Sin `CRITICAL`/`WARNING` nuevos, y **sin errores de parseo de CSS** en el log.
 
-**Números de referencia (rama actual `d81d4c9`, sidebar oculto):**
+**Números de referencia (sidebar oculto, tras el ajuste de altura del HeaderBar):**
 
 | Estado | Rect |
 |---|---|
-| Ventana | `left=14 top=81 right=1114 bottom=764` |
-| Maximizado | `left=0 top=67 right=1920 bottom=1080` |
+| Ventana | `top=61` (el HeaderBar mide 61 px, antes 67) |
 
-> **Ojo:** estos números son **con el sidebar oculto**. Si el sidebar se abre, el
-> ancho de `web_area` **bajará** (~250 px menos) y `right` cambiará. Eso es
-> **esperado y correcto**, no una regresión. Lo que debe cumplirse siempre es la
-> **coherencia** (`right−left` = ancho real del área web).
+> Medido en runtime: el HeaderBar pasó de **67 px a 61 px** con el commit
+> `6504143`. Si el sidebar se abre, el ancho de `web_area` **bajará** (~250 px
+> menos) y `right` cambiará: eso es **esperado**, no una regresión. Lo que debe
+> cumplirse siempre es la **coherencia** (`right−left` = ancho real del área web).
 
 ---
 
@@ -409,6 +410,6 @@ engine.load_finished.connect((success, error) => {
 >   es la coherencia.
 > - Sin `CRITICAL`/`WARNING` nuevos ni errores de parseo de CSS.
 >
-> **Números de referencia (sidebar oculto, rama actual):** ventana
-> `left=14 top=81 right=1114 bottom=764`; maximizado
-> `left=0 top=67 right=1920 bottom=1080`.
+> **Números de referencia (sidebar oculto, con el HeaderBar ya ajustado):** el
+> HeaderBar mide **61 px** (bajó de 67 en el commit `6504143`). Partí siempre del
+> **último master**, que ya incluye ese ajuste.
