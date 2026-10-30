@@ -18,30 +18,8 @@ baobabs_core_sources = files(
 
 extra_includes = [include_directories('.')]
 
-if is_windows
-  add_project_arguments('-D', 'WINDOWS', language: 'vala')
-
-  baobabs_core_sources += files(
-    'engine/webview2.vala',
-    'engine/webview2/webview2_bridge.vapi',
-    'engine/webview2/webview2_bridge.cpp',
-    'engine/webview2/webview2_bridge_helper.c',
-  )
-
-  extra_includes += include_directories(
-    '../deps/webview2/pkg/build/native/include',
-    'engine/webview2',
-  )
-
-  # Copiar WebView2Loader.dll junto al ejecutable en el directorio de salida
-  configure_file(
-    input: meson.project_source_root() / 'deps/webview2/pkg/runtimes/win-x64/native/WebView2Loader.dll',
-    output: 'WebView2Loader.dll',
-    copy: true,
-  )
-else
-  baobabs_core_sources += files('engine/webkit.vala')
-endif
+# Motor web: solo WebKitGTK en esta versión Vala.
+baobabs_core_sources += files('engine/webkit.vala')
 
 # Compilar el recurso (en data/, donde ya vive Reader.html)
 gnome = import('gnome')

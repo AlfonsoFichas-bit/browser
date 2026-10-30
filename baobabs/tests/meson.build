@@ -1,11 +1,3 @@
-if is_windows
-  configure_file(
-    input: meson.project_source_root() / 'deps/webview2/pkg/runtimes/win-x64/native/WebView2Loader.dll',
-    output: 'WebView2Loader.dll',
-    copy: true,
-  )
-endif
-
 # Tests (epoch conversion, uuid, bookmarks model)
 test_epoch = executable('test-epoch',
   files('test_epoch.vala'),
@@ -33,10 +25,8 @@ test('plist writer round-trip', test_plist_writer,
   args: [meson.current_source_dir() / 'fixtures'],
 )
 
-if not is_windows
-  test_webkit = executable('test-webkit',
-    files('test_webkit_engine.vala'),
-    dependencies: baobabs_core_dep,
-  )
-  test('webkit engine', test_webkit)
-endif
+test_webkit = executable('test-webkit',
+  files('test_webkit_engine.vala'),
+  dependencies: baobabs_core_dep,
+)
+test('webkit engine', test_webkit)
