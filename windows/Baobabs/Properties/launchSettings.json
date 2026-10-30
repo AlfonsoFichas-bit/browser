@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Baobabs (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Baobabs (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
