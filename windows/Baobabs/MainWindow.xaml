@@ -18,17 +18,56 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TitleBar x:Name="AppTitleBar" Title="Baobabs">
-            <TitleBar.IconSource>
-                <ImageIconSource ImageSource="Assets/AppIcon.ico" />
-            </TitleBar.IconSource>
-        </TitleBar>
+        <!-- The background that acts as the draggable TitleBar -->
+        <Border x:Name="AppTitleBar" Grid.Row="0" Height="48" Background="Transparent" />
 
-        <!--
-            The Frame hosts pages for your application content. Add your UI to
-            MainPage.xaml rather than here so you can use Page features such as
-            navigation events and the Loaded lifecycle.
-        -->
+        <!-- The interactive controls laid OVER the TitleBar, ensuring they can be clicked -->
+        <Grid Grid.Row="0" Height="48" Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <!-- Space for system caption buttons -->
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Sidebar Toggle Button -->
+            <Button Grid.Column="0"
+                    Margin="8,0,4,0"
+                    VerticalAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    ToolTipService.ToolTip="Toggle Sidebar">
+                <FontIcon Glyph="&#xE700;" FontFamily="Segoe Fluent Icons" />
+            </Button>
+
+            <!-- Navigation Buttons -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,8,0">
+                <Button Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Back">
+                    <FontIcon Glyph="&#xE72B;" FontFamily="Segoe Fluent Icons" />
+                </Button>
+                <Button Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Forward">
+                    <FontIcon Glyph="&#xE72A;" FontFamily="Segoe Fluent Icons" />
+                </Button>
+            </StackPanel>
+
+            <!-- Address Bar inside TitleBar -->
+            <TextBox Grid.Column="2"
+                     x:Name="AddressBar"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch"
+                     PlaceholderText="Search or enter web address"
+                     Margin="8,0,32,0"
+                     Height="32">
+                <TextBox.Header>
+                    <TextBlock Visibility="Collapsed" />
+                </TextBox.Header>
+            </TextBox>
+
+            <Grid Grid.Column="3" Width="140" Background="Transparent" />
+        </Grid>
+
+        <!-- Main Content Area -->
         <Frame x:Name="RootFrame" Grid.Row="1" />
     </Grid>
 </Window>

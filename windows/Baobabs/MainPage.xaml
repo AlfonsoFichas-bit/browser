@@ -9,6 +9,19 @@
     mc:Ignorable="d">
 
     <Grid>
-        <WebView2 x:Name="MyWebView" Source="https://duckduckgo.com" />
+        <Grid.ColumnDefinitions>
+            <!-- Sidebar placeholder: Collapsed by default -->
+            <ColumnDefinition Width="Auto" />
+            <!-- Main Web Content -->
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar Placeholder (for future use) -->
+        <Border Grid.Column="0" x:Name="SidebarContainer" Visibility="Collapsed" Width="250" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,0,1,0">
+            <TextBlock Text="Bookmarks Sidebar" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </Border>
+
+        <!-- Browser Engine -->
+        <WebView2 Grid.Column="1" x:Name="MyWebView" Source="https://duckduckgo.com" />
     </Grid>
 </Page>

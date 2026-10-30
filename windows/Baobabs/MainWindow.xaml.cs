@@ -1,4 +1,6 @@
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -16,10 +18,17 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
 
+        // Extiende el contenido hacia la barra de título
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
+
+        // Deshabilitar el botón de minimizar
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.IsMinimizable = false;
+        }
 
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MainPage));
