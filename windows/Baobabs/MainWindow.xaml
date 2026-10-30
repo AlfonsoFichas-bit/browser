@@ -18,17 +18,14 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- The background that acts as the draggable TitleBar -->
-        <Border x:Name="AppTitleBar" Grid.Row="0" Height="48" Background="Transparent" />
-
-        <!-- The interactive controls laid OVER the TitleBar, ensuring they can be clicked -->
         <Grid Grid.Row="0" Height="48" Background="Transparent">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MaxWidth="800" />
                 <ColumnDefinition Width="*" />
                 <!-- Space for system caption buttons -->
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="140" />
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar Toggle Button -->
@@ -57,14 +54,16 @@
                      VerticalAlignment="Center"
                      HorizontalAlignment="Stretch"
                      PlaceholderText="Search or enter web address"
-                     Margin="8,0,32,0"
-                     Height="32">
+                     Margin="8,0,8,0">
                 <TextBox.Header>
                     <TextBlock Visibility="Collapsed" />
                 </TextBox.Header>
             </TextBox>
 
-            <Grid Grid.Column="3" Width="140" Background="Transparent" />
+            <!-- The background that acts as the draggable TitleBar -->
+            <Border x:Name="AppTitleBar" Grid.Column="3" Background="Transparent" />
+
+            <Grid Grid.Column="4" Background="Transparent" />
         </Grid>
 
         <!-- Main Content Area -->

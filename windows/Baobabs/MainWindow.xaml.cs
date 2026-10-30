@@ -24,12 +24,6 @@ public sealed partial class MainWindow : Window
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
 
-        // Deshabilitar el botón de minimizar
-        if (AppWindow.Presenter is OverlappedPresenter presenter)
-        {
-            presenter.IsMinimizable = false;
-        }
-
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MainPage));
     }
