@@ -65,6 +65,7 @@
                      PlaceholderText="Search or enter web address"
                      Margin="8,2,8,0"
                      CornerRadius="16"
+                     BorderThickness="0"
                      KeyDown="AddressBar_KeyDown" />
 
             <!-- Right side draggable area and space for caption buttons -->
