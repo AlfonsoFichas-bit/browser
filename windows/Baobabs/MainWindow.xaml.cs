@@ -29,6 +29,57 @@ public sealed partial class MainWindow : Window
 
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MainPage));
+
+        if (RootFrame.Content is MainPage mainPage)
+        {
+            mainPage.UrlChanged += MainPage_UrlChanged;
+            mainPage.TitleChanged += MainPage_TitleChanged;
+            mainPage.NavigationStateChanged += MainPage_NavigationStateChanged;
+        }
+    }
+
+    private void MainPage_UrlChanged(object sender, string e)
+    {
+        // Don't override if the user is currently typing
+        if (!AddressBar.FocusState.Equals(FocusState.Keyboard) && !AddressBar.FocusState.Equals(FocusState.Pointer))
+        {
+            AddressBar.Text = e;
+        }
+    }
+
+    private void MainPage_TitleChanged(object sender, string e)
+    {
+        this.Title = string.IsNullOrWhiteSpace(e) ? "Baobabs" : $"{e} — Baobabs";
+    }
+
+    private void MainPage_NavigationStateChanged(object sender, (bool canGoBack, bool canGoForward) e)
+    {
+        BackButton.IsEnabled = e.canGoBack;
+        ForwardButton.IsEnabled = e.canGoForward;
+    }
+
+    private void BackButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (RootFrame.Content is MainPage mainPage)
+        {
+            mainPage.GoBack();
+        }
+    }
+
+    private void ForwardButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (RootFrame.Content is MainPage mainPage)
+        {
+            mainPage.GoForward();
+        }
+    }
+
+    private void SidebarToggleButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (RootFrame.Content is MainPage mainPage)
+        {
+            mainPage.ToggleSidebar();
+        }
     }
 
     private void AddressBar_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)

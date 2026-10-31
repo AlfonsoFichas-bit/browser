@@ -35,20 +35,22 @@
 
                 <!-- Sidebar Toggle Button -->
                 <Button Grid.Column="0"
+                        x:Name="SidebarToggleButton"
                         Margin="8,0,4,0"
                         VerticalAlignment="Center"
                         Background="Transparent"
                         BorderThickness="0"
-                        ToolTipService.ToolTip="Toggle Sidebar">
+                        ToolTipService.ToolTip="Toggle Sidebar"
+                        Click="SidebarToggleButton_Click">
                     <FontIcon Glyph="&#xE700;" FontFamily="Segoe Fluent Icons" />
                 </Button>
 
                 <!-- Navigation Buttons -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,8,0">
-                    <Button Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Back">
+                    <Button x:Name="BackButton" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Back" IsEnabled="False" Click="BackButton_Click">
                         <FontIcon Glyph="&#xE72B;" FontFamily="Segoe Fluent Icons" />
                     </Button>
-                    <Button Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Forward">
+                    <Button x:Name="ForwardButton" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Forward" IsEnabled="False" Click="ForwardButton_Click">
                         <FontIcon Glyph="&#xE72A;" FontFamily="Segoe Fluent Icons" />
                     </Button>
                 </StackPanel>
