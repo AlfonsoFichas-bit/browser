@@ -19,8 +19,55 @@ public sealed partial class MainPage : Page
     {
         InitializeComponent();
 
+        Baobabs.Models.HistoryManager.Load();
+        Baobabs.Models.BookmarksManager.Load();
+
+        HistoryList.ItemsSource = Baobabs.Models.HistoryManager.History;
+        BookmarksList.ItemsSource = Baobabs.Models.BookmarksManager.Bookmarks;
+
         MyWebView.NavigationCompleted += MyWebView_NavigationCompleted;
         MyWebView.CoreWebView2Initialized += MyWebView_CoreWebView2Initialized;
+    }
+
+    private void SidebarTab_Checked(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        if (sender is Microsoft.UI.Xaml.Controls.RadioButton rb)
+        {
+            if (rb == TabBookmarks)
+            {
+                BookmarksList.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                ReadingListPlaceholder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                HistoryList.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            }
+            else if (rb == TabReadingList)
+            {
+                BookmarksList.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                ReadingListPlaceholder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                HistoryList.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            }
+            else if (rb == TabHistory)
+            {
+                BookmarksList.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                ReadingListPlaceholder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                HistoryList.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+            }
+        }
+    }
+
+    private void SidebarList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ListView listView && listView.SelectedItem != null)
+        {
+            if (listView.SelectedItem is Baobabs.Models.HistoryEntry he)
+            {
+                NavigateTo(he.Url);
+            }
+            else if (listView.SelectedItem is Baobabs.Models.BookmarkEntry be)
+            {
+                NavigateTo(be.Url);
+            }
+            listView.SelectedItem = null;
+        }
     }
 
     private void MyWebView_CoreWebView2Initialized(Microsoft.UI.Xaml.Controls.WebView2 sender, Microsoft.UI.Xaml.Controls.CoreWebView2InitializedEventArgs args)
@@ -47,6 +94,16 @@ public sealed partial class MainPage : Page
 
     private void MyWebView_NavigationCompleted(Microsoft.UI.Xaml.Controls.WebView2 sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs args)
     {
+        if (args.IsSuccess && sender.CoreWebView2 != null)
+        {
+            string url = sender.CoreWebView2.Source;
+            string title = sender.CoreWebView2.DocumentTitle;
+            if (!string.IsNullOrEmpty(url))
+            {
+                Baobabs.Models.HistoryManager.AddEntry(url, title ?? url);
+            }
+        }
+
         // Fallback for updating state if HistoryChanged missed something
         NavigationStateChanged?.Invoke(this, (MyWebView.CanGoBack, MyWebView.CanGoForward));
     }
@@ -78,11 +135,12 @@ public sealed partial class MainPage : Page
     {
         try
         {
-            if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            string finalUrl = url;
+            if (!finalUrl.StartsWith("http://") && !finalUrl.StartsWith("https://"))
             {
-                url = "https://" + url;
+                finalUrl = "https://" + finalUrl;
             }
-            MyWebView.Source = new System.Uri(url);
+            MyWebView.Source = new System.Uri(finalUrl);
         }
         catch (System.Exception)
         {

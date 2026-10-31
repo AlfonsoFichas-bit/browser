@@ -27,6 +27,9 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\AppIcon.ico" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Assets\book.svg" />
+    <Content Include="Assets\glasses.svg" />
+    <Content Include="Assets\history.svg" />
   </ItemGroup>
 
   <ItemGroup>
