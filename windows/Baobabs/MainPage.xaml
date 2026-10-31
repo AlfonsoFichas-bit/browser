@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Baobabs.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Baobabs"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="ToggleButtonRadioStyle" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Grid Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="Background" Value="{ThemeResource ButtonBackgroundPointerOver}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="Background" Value="{ThemeResource ButtonBackgroundPressed}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="CheckStates">
+                                    <VisualState x:Name="Checked">
+                                        <VisualState.Setters>
+                                            <Setter Target="Background" Value="{ThemeResource AccentButtonBackground}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Unchecked" />
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Sidebar placeholder: Collapsed by default -->
+            <ColumnDefinition Width="Auto" />
+            <!-- Main Web Content -->
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar Container -->
+        <Border Grid.Column="0" x:Name="SidebarContainer" Visibility="Collapsed" Width="250" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Sidebar Tabs -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,8" Spacing="4">
+                    <RadioButton x:Name="TabBookmarks" Style="{StaticResource ToggleButtonRadioStyle}" IsChecked="True" Checked="SidebarTab_Checked" Width="32" Height="32" Background="Transparent" BorderThickness="0" CornerRadius="8">
+                        <ImageIcon Width="18" Height="18">
+                            <ImageIcon.Source>
+                                <SvgImageSource UriSource="ms-appx:///Assets/book.svg" />
+                            </ImageIcon.Source>
+                        </ImageIcon>
+                    </RadioButton>
+                    <RadioButton x:Name="TabReadingList" Style="{StaticResource ToggleButtonRadioStyle}" Checked="SidebarTab_Checked" Width="32" Height="32" Background="Transparent" BorderThickness="0" CornerRadius="8">
+                        <ImageIcon Width="18" Height="18">
+                            <ImageIcon.Source>
+                                <SvgImageSource UriSource="ms-appx:///Assets/glasses.svg" />
+                            </ImageIcon.Source>
+                        </ImageIcon>
+                    </RadioButton>
+                    <RadioButton x:Name="TabHistory" Style="{StaticResource ToggleButtonRadioStyle}" Checked="SidebarTab_Checked" Width="32" Height="32" Background="Transparent" BorderThickness="0" CornerRadius="8">
+                        <ImageIcon Width="18" Height="18">
+                            <ImageIcon.Source>
+                                <SvgImageSource UriSource="ms-appx:///Assets/history.svg" />
+                            </ImageIcon.Source>
+                        </ImageIcon>
+                    </RadioButton>
+                </StackPanel>
+
+                <!-- Bookmarks List -->
+                <ListView Grid.Row="1" x:Name="BookmarksList" Visibility="Visible" SelectionChanged="SidebarList_SelectionChanged">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,4,0,4">
+                                <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding Url}" TextTrimming="CharacterEllipsis" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- Reading List (Placeholder) -->
+                <TextBlock Grid.Row="1" x:Name="ReadingListPlaceholder" Text="Reading List" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                <!-- History List -->
+                <ListView Grid.Row="1" x:Name="HistoryList" Visibility="Collapsed" SelectionChanged="SidebarList_SelectionChanged">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,4,0,4">
+                                <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding Url}" TextTrimming="CharacterEllipsis" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Border>
+
+        <!-- Browser Engine -->
+        <WebView2 Grid.Column="1" x:Name="MyWebView" Source="https://duckduckgo.com" />
+    </Grid>
+</Page>
