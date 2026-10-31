@@ -64,11 +64,14 @@
                      x:Name="AddressBar"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Stretch"
+                     TextAlignment="Center"
                      PlaceholderText="Search or enter web address"
                      Margin="8,2,8,0"
                      CornerRadius="16"
                      BorderThickness="0"
-                     KeyDown="AddressBar_KeyDown" />
+                     KeyDown="AddressBar_KeyDown"
+                     GotFocus="AddressBar_GotFocus"
+                     LostFocus="AddressBar_LostFocus" />
 
             <!-- Right side draggable area and space for caption buttons -->
             <Grid Grid.Column="2">

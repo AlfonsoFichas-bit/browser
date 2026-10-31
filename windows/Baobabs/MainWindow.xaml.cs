@@ -14,6 +14,8 @@ namespace Baobabs;
 /// </summary>
 public sealed partial class MainWindow : Window
 {
+    private string currentFullUrl = "";
+
     public MainWindow()
     {
         InitializeComponent();
@@ -38,12 +40,34 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private string GetShortUrl(string fullUrl)
+    {
+        if (string.IsNullOrWhiteSpace(fullUrl)) return "";
+
+        try
+        {
+            Uri uri = new Uri(fullUrl);
+            string host = uri.Host;
+            if (host.StartsWith("www."))
+            {
+                host = host.Substring(4);
+            }
+            return host;
+        }
+        catch
+        {
+            return fullUrl;
+        }
+    }
+
     private void MainPage_UrlChanged(object sender, string e)
     {
+        currentFullUrl = e;
+
         // Don't override if the user is currently typing
         if (!AddressBar.FocusState.Equals(FocusState.Keyboard) && !AddressBar.FocusState.Equals(FocusState.Pointer))
         {
-            AddressBar.Text = e;
+            AddressBar.Text = GetShortUrl(currentFullUrl);
         }
     }
 
@@ -82,6 +106,17 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private void AddressBar_GotFocus(object sender, RoutedEventArgs e)
+    {
+        AddressBar.Text = currentFullUrl;
+        AddressBar.SelectAll();
+    }
+
+    private void AddressBar_LostFocus(object sender, RoutedEventArgs e)
+    {
+        AddressBar.Text = GetShortUrl(currentFullUrl);
+    }
+
     private void AddressBar_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
     {
         if (e.Key == Windows.System.VirtualKey.Enter)
@@ -89,6 +124,9 @@ public sealed partial class MainWindow : Window
             if (RootFrame.Content is MainPage mainPage)
             {
                 mainPage.NavigateTo(AddressBar.Text);
+
+                // Remove focus from the AddressBar after navigation
+                this.Content.Focus(FocusState.Programmatic);
             }
             e.Handled = true;
         }
