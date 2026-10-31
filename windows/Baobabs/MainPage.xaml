@@ -22,15 +22,21 @@
                                 <VisualStateGroup x:Name="CommonStates">
                                     <VisualState x:Name="Normal" />
                                     <VisualState x:Name="PointerOver">
-                                        <Setter Target="Background" Value="{ThemeResource ButtonBackgroundPointerOver}" />
+                                        <VisualState.Setters>
+                                            <Setter Target="Background" Value="{ThemeResource ButtonBackgroundPointerOver}" />
+                                        </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Pressed">
-                                        <Setter Target="Background" Value="{ThemeResource ButtonBackgroundPressed}" />
+                                        <VisualState.Setters>
+                                            <Setter Target="Background" Value="{ThemeResource ButtonBackgroundPressed}" />
+                                        </VisualState.Setters>
                                     </VisualState>
                                 </VisualStateGroup>
                                 <VisualStateGroup x:Name="CheckStates">
                                     <VisualState x:Name="Checked">
-                                        <Setter Target="Background" Value="{ThemeResource AccentButtonBackground}" />
+                                        <VisualState.Setters>
+                                            <Setter Target="Background" Value="{ThemeResource AccentButtonBackground}" />
+                                        </VisualState.Setters>
                                     </VisualState>
                                     <VisualState x:Name="Unchecked" />
                                 </VisualStateGroup>
