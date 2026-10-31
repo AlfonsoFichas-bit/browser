@@ -18,7 +18,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Height="48" Background="Transparent">
+        <Grid Grid.Row="0" Height="40" Background="Transparent">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="2*" MaxWidth="800" />
@@ -64,6 +64,7 @@
                      HorizontalAlignment="Stretch"
                      PlaceholderText="Search or enter web address"
                      Margin="8,0,8,0"
+                     CornerRadius="16"
                      KeyDown="AddressBar_KeyDown">
                 <TextBox.Header>
                     <TextBlock Visibility="Collapsed" />
