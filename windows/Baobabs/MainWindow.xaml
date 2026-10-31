@@ -63,13 +63,9 @@
                      VerticalAlignment="Center"
                      HorizontalAlignment="Stretch"
                      PlaceholderText="Search or enter web address"
-                     Margin="8,0,8,0"
+                     Margin="8,2,8,0"
                      CornerRadius="16"
-                     KeyDown="AddressBar_KeyDown">
-                <TextBox.Header>
-                    <TextBlock Visibility="Collapsed" />
-                </TextBox.Header>
-            </TextBox>
+                     KeyDown="AddressBar_KeyDown" />
 
             <!-- Right side draggable area and space for caption buttons -->
             <Grid Grid.Column="2">
