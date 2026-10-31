@@ -20,11 +20,26 @@ public sealed partial class MainWindow : Window
 
         // Extiende el contenido hacia la barra de título
         ExtendsContentIntoTitleBar = true;
-        SetTitleBar(AppTitleBar);
+
+        // We set the right side empty border as the primary draggable title bar
+        // (WinUI 3 SetTitleBar only takes one element, but standard empty areas also drag).
+        SetTitleBar(AppTitleBarRight);
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
 
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MainPage));
+    }
+
+    private void AddressBar_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            if (RootFrame.Content is MainPage mainPage)
+            {
+                mainPage.NavigateTo(AddressBar.Text);
+            }
+            e.Handled = true;
+        }
     }
 }

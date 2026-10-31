@@ -17,4 +17,20 @@ public sealed partial class MainPage : Page
 
         // TODO: Add your initialization logic here.
     }
+
+    public void NavigateTo(string url)
+    {
+        try
+        {
+            if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            {
+                url = "https://" + url;
+            }
+            MyWebView.Source = new System.Uri(url);
+        }
+        catch (System.Exception)
+        {
+            MyWebView.Source = new System.Uri("https://duckduckgo.com/?q=" + System.Uri.EscapeDataString(url));
+        }
+    }
 }

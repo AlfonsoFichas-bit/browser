@@ -20,50 +20,69 @@
 
         <Grid Grid.Row="0" Height="48" Background="Transparent">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" MaxWidth="800" />
                 <ColumnDefinition Width="*" />
-                <!-- Space for system caption buttons -->
-                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="2*" MaxWidth="800" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- Sidebar Toggle Button -->
-            <Button Grid.Column="0"
-                    Margin="8,0,4,0"
-                    VerticalAlignment="Center"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    ToolTipService.ToolTip="Toggle Sidebar">
-                <FontIcon Glyph="&#xE700;" FontFamily="Segoe Fluent Icons" />
-            </Button>
+            <!-- Left Controls & Draggable Area -->
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <!-- Navigation Buttons -->
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,8,0">
-                <Button Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Back">
-                    <FontIcon Glyph="&#xE72B;" FontFamily="Segoe Fluent Icons" />
+                <!-- Sidebar Toggle Button -->
+                <Button Grid.Column="0"
+                        Margin="8,0,4,0"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        ToolTipService.ToolTip="Toggle Sidebar">
+                    <FontIcon Glyph="&#xE700;" FontFamily="Segoe Fluent Icons" />
                 </Button>
-                <Button Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Forward">
-                    <FontIcon Glyph="&#xE72A;" FontFamily="Segoe Fluent Icons" />
-                </Button>
-            </StackPanel>
 
-            <!-- Address Bar inside TitleBar -->
-            <TextBox Grid.Column="2"
+                <!-- Navigation Buttons -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,8,0">
+                    <Button Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Back">
+                        <FontIcon Glyph="&#xE72B;" FontFamily="Segoe Fluent Icons" />
+                    </Button>
+                    <Button Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Forward">
+                        <FontIcon Glyph="&#xE72A;" FontFamily="Segoe Fluent Icons" />
+                    </Button>
+                </StackPanel>
+
+                <!-- The background that acts as the draggable TitleBar on the left -->
+                <Border x:Name="AppTitleBarLeft" Grid.Column="2" Background="Transparent" />
+            </Grid>
+
+            <!-- Address Bar inside TitleBar, centered -->
+            <TextBox Grid.Column="1"
                      x:Name="AddressBar"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Stretch"
                      PlaceholderText="Search or enter web address"
-                     Margin="8,0,8,0">
+                     Margin="8,0,8,0"
+                     KeyDown="AddressBar_KeyDown">
                 <TextBox.Header>
                     <TextBlock Visibility="Collapsed" />
                 </TextBox.Header>
             </TextBox>
 
-            <!-- The background that acts as the draggable TitleBar -->
-            <Border x:Name="AppTitleBar" Grid.Column="3" Background="Transparent" />
+            <!-- Right side draggable area and space for caption buttons -->
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="140" />
+                </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="4" Background="Transparent" />
+                <!-- The background that acts as the draggable TitleBar on the right -->
+                <Border x:Name="AppTitleBarRight" Grid.Column="0" Background="Transparent" />
+
+                <!-- Space for system caption buttons -->
+                <Grid Grid.Column="1" Background="Transparent" />
+            </Grid>
         </Grid>
 
         <!-- Main Content Area -->
