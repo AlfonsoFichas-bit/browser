@@ -59,23 +59,23 @@
                 </Grid.RowDefinitions>
 
                 <!-- Sidebar Tabs -->
-                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,8" Spacing="8">
-                    <RadioButton x:Name="TabBookmarks" Style="{StaticResource ToggleButtonRadioStyle}" IsChecked="True" Checked="SidebarTab_Checked" Width="40" Height="40" Background="Transparent" BorderThickness="0" CornerRadius="8">
-                        <ImageIcon Width="24" Height="24">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,8" Spacing="4">
+                    <RadioButton x:Name="TabBookmarks" Style="{StaticResource ToggleButtonRadioStyle}" IsChecked="True" Checked="SidebarTab_Checked" Width="32" Height="32" Background="Transparent" BorderThickness="0" CornerRadius="8">
+                        <ImageIcon Width="18" Height="18">
                             <ImageIcon.Source>
                                 <SvgImageSource UriSource="ms-appx:///Assets/book.svg" />
                             </ImageIcon.Source>
                         </ImageIcon>
                     </RadioButton>
-                    <RadioButton x:Name="TabReadingList" Style="{StaticResource ToggleButtonRadioStyle}" Checked="SidebarTab_Checked" Width="40" Height="40" Background="Transparent" BorderThickness="0" CornerRadius="8">
-                        <ImageIcon Width="24" Height="24">
+                    <RadioButton x:Name="TabReadingList" Style="{StaticResource ToggleButtonRadioStyle}" Checked="SidebarTab_Checked" Width="32" Height="32" Background="Transparent" BorderThickness="0" CornerRadius="8">
+                        <ImageIcon Width="18" Height="18">
                             <ImageIcon.Source>
                                 <SvgImageSource UriSource="ms-appx:///Assets/glasses.svg" />
                             </ImageIcon.Source>
                         </ImageIcon>
                     </RadioButton>
-                    <RadioButton x:Name="TabHistory" Style="{StaticResource ToggleButtonRadioStyle}" Checked="SidebarTab_Checked" Width="40" Height="40" Background="Transparent" BorderThickness="0" CornerRadius="8">
-                        <ImageIcon Width="24" Height="24">
+                    <RadioButton x:Name="TabHistory" Style="{StaticResource ToggleButtonRadioStyle}" Checked="SidebarTab_Checked" Width="32" Height="32" Background="Transparent" BorderThickness="0" CornerRadius="8">
+                        <ImageIcon Width="18" Height="18">
                             <ImageIcon.Source>
                                 <SvgImageSource UriSource="ms-appx:///Assets/history.svg" />
                             </ImageIcon.Source>
